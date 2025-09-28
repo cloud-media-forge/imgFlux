@@ -13,15 +13,27 @@ fi
 if command -v mvn &> /dev/null
 then
     echo "Building with Maven..."
-    mvn spring-boot:run
+    mvn clean install
+    
+    # 启动各个服务模块
+    echo "Starting Image Upload API service..."
+    mvn spring-boot:run -pl image-upload-api &
+    
+    echo "Starting Image Download API service..."
+    mvn spring-boot:run -pl image-download-api &
+    
+    echo "Starting Image Admin UI service..."
+    mvn spring-boot:run -pl image-admin-ui &
+    
+    echo "All services started. Press Ctrl+C to stop."
+    wait
 else
     echo "Maven is not installed."
     echo "To run this application, please:"
     echo "1. Install Maven (https://maven.apache.org/install.html)"
-    echo "2. Run 'mvn spring-boot:run' in the project directory"
-    echo ""
-    echo "Alternatively, you can build a JAR file and run it directly:"
-    echo "1. Install Maven"
-    echo "2. Run 'mvn clean package'"
-    echo "3. Run 'java -jar target/image-service-0.0.1-SNAPSHOT.jar'"
+    echo "2. Run 'mvn clean install' in the project directory"
+    echo "3. Run each service separately:"
+    echo "   mvn spring-boot:run -pl image-upload-api"
+    echo "   mvn spring-boot:run -pl image-download-api"
+    echo "   mvn spring-boot:run -pl image-admin-ui"
 fi
