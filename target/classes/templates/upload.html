@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image - Image Service Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/admin/dashboard}">Image Service Admin</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.username}"></span>
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a th:href="@{/admin/dashboard}" class="list-group-item list-group-item-action">Dashboard</a>
+                    <a th:href="@{/admin/images}" class="list-group-item list-group-item-action">My Images</a>
+                    <a th:href="@{/admin/upload}" class="list-group-item list-group-item-action active">Upload Image</a>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <h2>Upload New Image</h2>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Select Image</label>
+                                <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                                <div class="form-text">Supported formats: JPG, JPEG, PNG, GIF, AVIF (Max 10MB)</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="width" class="form-label">Width (px)</label>
+                                        <input type="number" class="form-control" id="width" name="width" min="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="height" class="form-label">Height (px)</label>
+                                        <input type="number" class="form-control" id="height" name="height" min="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="quality" class="form-label">Quality (1-100)</label>
+                                <input type="number" class="form-control" id="quality" name="quality" min="1" max="100" value="80">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="format" class="form-label">Target Format</label>
+                                <select class="form-select" id="format" name="format">
+                                    <option value="">Keep Original</option>
+                                    <option value="JPG">JPG</option>
+                                    <option value="JPEG">JPEG</option>
+                                    <option value="PNG">PNG</option>
+                                    <option value="GIF">GIF</option>
+                                    <option value="AVIF">AVIF</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="extent" name="extent">
+                                <label class="form-check-label" for="extent">
+                                    Extend image to exact dimensions
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="trim" name="trim">
+                                <label class="form-check-label" for="trim">
+                                    Trim image
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Upload Image</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-3" id="resultCard" style="display: none;">
+                    <div class="card-header">
+                        Upload Result
+                    </div>
+                    <div class="card-body">
+                        <div id="resultMessage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('file').files[0]);
+            formData.append('width', document.getElementById('width').value);
+            formData.append('height', document.getElementById('height').value);
+            formData.append('quality', document.getElementById('quality').value);
+            formData.append('extent', document.getElementById('extent').checked);
+            formData.append('trim', document.getElementById('trim').checked);
+            formData.append('format', document.getElementById('format').value);
+            
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">' + data + '</div>';
+                document.getElementById('resultCard').style.display = 'block';
+            })
+            .catch(error => {
+                document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Upload failed: ' + error.message + '</div>';
+                document.getElementById('resultCard').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
