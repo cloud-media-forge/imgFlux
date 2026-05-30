@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Images - Image Flux Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/admin/dashboard}">Image Flux Admin</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${username}"></span>
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload New Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select Image</label>
+                            <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                            <div class="form-text">Supported formats: JPG, JPEG, PNG, GIF, AVIF (Max 10MB)</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="processImage" name="processImage">
+                            <label class="form-check-label" for="processImage">
+                                Process image (resize, quality, format conversion)
+                            </label>
+                        </div>
+                        
+                        <div id="processingOptions" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="width" class="form-label">Width (px)</label>
+                                        <input type="number" class="form-control" id="width" name="width" min="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="height" class="form-label">Height (px)</label>
+                                        <input type="number" class="form-control" id="height" name="height" min="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="quality" class="form-label">Quality (1-100)</label>
+                                <input type="number" class="form-control" id="quality" name="quality" min="1" max="100" value="80">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="format" class="form-label">Target Format</label>
+                                <select class="form-select" id="format" name="format">
+                                    <option value="">Keep Original</option>
+                                    <option value="JPG">JPG</option>
+                                    <option value="JPEG">JPEG</option>
+                                    <option value="PNG">PNG</option>
+                                    <option value="GIF">GIF</option>
+                                    <option value="AVIF">AVIF</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="extent" name="extent">
+                                <label class="form-check-label" for="extent">
+                                    Extend image to exact dimensions
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="trim" name="trim">
+                                <label class="form-check-label" for="trim">
+                                    Trim image
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="uploadButton">Upload Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Folder Modal -->
+    <div class="modal fade" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createFolderModalLabel">Create New Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFolderForm">
+                        <div class="mb-3">
+                            <label for="folderName" class="form-label">Folder Name</label>
+                            <input type="text" class="form-control" id="folderName" name="folderName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="createFolderButton">Create Folder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultModalLabel">Result</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="resultMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a th:href="@{/admin/dashboard}" class="list-group-item list-group-item-action">Dashboard</a>
+                    <a th:href="@{/admin/images}" class="list-group-item list-group-item-action active">My Images</a>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2>My Images</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a th:href="@{/admin/images}">Home</a></li>
+                                <li class="breadcrumb-item active" th:if="${currentPath != null and !currentPath.isEmpty()}" th:text="${currentPath}"></li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div>
+                        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createFolderModal">Create Folder</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload New Image</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>大小</th>
+                                <th>最后修改时间</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="image : ${images}">
+                                <td>
+                                    <span th:if="${image.folder}">
+                                        <a th:href="@{/admin/images(path=${image.fullPath})}" th:text="${image.fileName}"></a>
+                                    </span>
+                                    <span th:if="${!image.folder}">
+                                        <a th:href="@{'/admin/image/' + ${image.fullPath}}" target="_blank" th:text="${image.fileName}"></a>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${image.folder}">-</span>
+                                    <span th:if="${!image.folder}" th:text="${image.fileSize != null ? #numbers.formatDecimal(image.fileSize / 1024.0, 1, 2) + ' KB' : 'N/A'}"></span>
+                                </td>
+                                <td th:text="${#temporals.format(image.lastModified, 'yyyy-MM-dd HH:mm:ss')}">Last Modified</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" th:attr="data-object-name=${image.fullPath}">Delete</button>
+                                </td>
+                            </tr>
+                            <tr th:if="${images.empty}">
+                                <td colspan="4" class="text-center">No images found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 处理图片处理选项的显示/隐藏
+        document.getElementById('processImage').addEventListener('change', function() {
+            const processingOptions = document.getElementById('processingOptions');
+            if (this.checked) {
+                processingOptions.style.display = 'block';
+            } else {
+                processingOptions.style.display = 'none';
+            }
+        });
+        
+        // 创建文件夹
+        document.getElementById('createFolderButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const folderName = document.getElementById('folderName').value;
+            if (!folderName) {
+                alert('Please enter a folder name');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('folderName', folderName);
+            // 获取当前路径
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPath = urlParams.get('path') || '';
+            formData.append('path', currentPath);
+            
+            fetch('/admin/images/create-folder', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">' + data + '</div>';
+                // Close create folder modal and show result modal
+                var createFolderModal = bootstrap.Modal.getInstance(document.getElementById('createFolderModal'));
+                createFolderModal.hide();
+                var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                resultModal.show();
+                
+                // Reset form and reload page after a short delay
+                document.getElementById('createFolderForm').reset();
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            })
+            .catch(error => {
+                document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Failed to create folder: ' + error.message + '</div>';
+                // Close create folder modal and show result modal
+                var createFolderModal = bootstrap.Modal.getInstance(document.getElementById('createFolderModal'));
+                createFolderModal.hide();
+                var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                resultModal.show();
+            });
+        });
+        
+        // 删除对象
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const objectName = this.getAttribute('data-object-name');
+                if (!confirm('Are you sure you want to delete ' + objectName + '?')) {
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('objectName', objectName);
+                
+                fetch('/admin/images/delete', {
+                    method: 'DELETE',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">' + data + '</div>';
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                    
+                    // Reload page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Failed to delete object: ' + error.message + '</div>';
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                });
+            });
+        });
+        
+        document.getElementById('uploadButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('file');
+            const processImageCheckbox = document.getElementById('processImage');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select a file to upload');
+                return;
+            }
+            
+            // 获取当前路径并添加到表单数据
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPath = urlParams.get('path') || '';
+            const fileName = currentPath + fileInput.files[0].name;
+            
+            formData.append('file', fileInput.files[0]);
+            
+            // 如果需要处理图片，则添加处理参数
+            if (processImageCheckbox.checked) {
+                formData.append('width', document.getElementById('width').value);
+                formData.append('height', document.getElementById('height').value);
+                formData.append('quality', document.getElementById('quality').value);
+                formData.append('extent', document.getElementById('extent').checked);
+                formData.append('trim', document.getElementById('trim').checked);
+                formData.append('format', document.getElementById('format').value);
+                
+                // 调用处理后的上传接口
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">' + data + '</div>';
+                    // Close upload modal and show result modal
+                    var uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                    uploadModal.hide();
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                    
+                    // Reset form
+                    document.getElementById('uploadForm').reset();
+                    document.getElementById('processingOptions').style.display = 'none';
+                })
+                .catch(error => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Upload failed: ' + error.message + '</div>';
+                    // Close upload modal and show result modal
+                    var uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                    uploadModal.hide();
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                });
+            } else {
+                // 直接上传原图，不进行处理
+                fetch('/api/upload/raw', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">' + data + '</div>';
+                    // Close upload modal and show result modal
+                    var uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                    uploadModal.hide();
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                    
+                    // Reset form
+                    document.getElementById('uploadForm').reset();
+                    document.getElementById('processingOptions').style.display = 'none';
+                })
+                .catch(error => {
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Upload failed: ' + error.message + '</div>';
+                    // Close upload modal and show result modal
+                    var uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                    uploadModal.hide();
+                    var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                    resultModal.show();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

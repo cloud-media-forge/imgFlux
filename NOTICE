@@ -1,0 +1,32 @@
+Copyright (c) 2025-present, Image Flux.
+
+Dependencies:
+================================================================
+GraphicsMagick:
+
+  * LICENSE:
+    * https://mit-license.org/ (MIT License)
+  * HOMEPAGE:
+    * http://www.graphicsmagick.org/Copyright.html
+
+
+Spring:
+
+  * LICENSE:
+    * http://www.apache.org/licenses/LICENSE-2.0 (Apache License 2.0)
+  * HOMEPAGE:
+    * http://www.springsource.org
+
+Netty:
+
+  * LICENSE:
+    * http://www.apache.org/licenses/LICENSE-2.0 (Apache License 2.0)
+  * HOMEPAGE:
+    * https://github.com/netty/netty
+
+SLF4J:
+
+  * LICENSE:
+    * http://www.apache.org/licenses/LICENSE-2.0 (Apache License 2.0)
+  * HOMEPAGE:
+    * http://www.slf4j.org
