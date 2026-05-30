@@ -1,0 +1,33 @@
+img-flux:
+  # Storage configuration
+  storage:
+    type: minio # 可选值: minio, aws, aliyun
+    bucket:
+      name: original-image
+    options:
+      # MinIO configuration
+      minio:
+        endpoint: http://localhost:9000
+        access-key: minioadmin
+        secret-key: minioadmin
+        bucket: original-image
+
+      # AWS S3 configuration
+      aws:
+        s3:
+          access-key-id: your-access-key-id
+          secret-access-key: your-secret-access-key
+          region: us-east-1
+          bucket: your-bucket-name
+
+      # Alibaba Cloud OSS configuration
+      alibaba:
+        oss:
+          access-key-id: your-access-key-id
+          access-key-secret: your-access-key-secret
+          endpoint: oss-cn-hangzhou.aliyuncs.com
+          bucket: your-bucket-name
+
+      # GraphicsMagick configuration
+      gm:
+        pool-size: 16 # 默认值为16

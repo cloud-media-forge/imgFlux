@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Image Flux Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/admin/dashboard}">Image Flux Admin</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${username}"></span>
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a th:href="@{/admin/dashboard}" class="list-group-item list-group-item-action active">Dashboard</a>
+                    <a th:href="@{/admin/images}" class="list-group-item list-group-item-action">My Images</a>
+                    <a th:href="@{/admin/upload}" class="list-group-item list-group-item-action">Upload Image</a>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <h2>Dashboard</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-header">Total Images</div>
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${images.size()}">0</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-header">Company</div>
+                            <div class="card-body">
+                                <h5 class="card-title">N/A</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info mb-3">
+                            <div class="card-header">Team</div>
+                            <div class="card-body">
+                                <h5 class="card-title">N/A</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Recent Images</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="image : ${images}" th:if="${imageStat.index < 5}">
+                                <td>
+                                    <!-- 显示缩略图 -->
+                                    <img th:src="@{'/api/v1/thumbnail/' + ${image.fileHash} + '?width=50&height=50'}"
+                                         alt="Thumbnail" class="img-thumbnail" style="width: 50px; height: 50px;" th:onerror="'this.src=\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2MiLz48dGV4dCB4PSI1MCIgeT0iNTAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjYiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==\''">
+                                </td>
+                                <td th:text="${image.fileName}">Filename</td>
+                                <td th:text="${image.fileSize}">Size</td>
+                                <td th:text="${image.createdAt != null ? image.createdAt : 'N/A'}">Date</td>
+                                <td>
+                                    <a th:href="@{/admin/images/{id}(id=${image.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${images.empty}">
+                                <td colspan="5" class="text-center">No images found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
