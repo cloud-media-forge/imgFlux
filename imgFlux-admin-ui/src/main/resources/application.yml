@@ -23,6 +23,16 @@ spring:
       name: admin
       password: admin123
 img-flux:
+  storage:
+    bucket:
+      name: origin-image
+    options:
+      minio:
+        endpoint: http://localhost:9000
+        access-key: minioadmin
+        secret-key: minioadmin
+        secure: false
+
   # CDN configuration
   cdn:
     base-url: http://localhost:9001

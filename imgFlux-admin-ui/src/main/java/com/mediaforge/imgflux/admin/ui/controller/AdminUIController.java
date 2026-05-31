@@ -3,7 +3,9 @@ package com.mediaforge.imgflux.admin.ui.controller;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,8 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +27,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminUIController {
     @Value("${img-flux.storage.bucket.name:origin-image}")
@@ -38,41 +39,44 @@ public class AdminUIController {
     private MinIOStorageService minIOStorageService;
 
     @GetMapping("/")
-    public String root() {
-        return "redirect:/admin/images";
+    public ResponseEntity<Void> root() {
+        return ResponseEntity.status(302).header("Location", "/admin/images").build();
     }
-    
+
     @GetMapping("")
-    public String rootSlash() {
-        return "redirect:/admin/images";
+    public ResponseEntity<Void> rootSlash() {
+        return ResponseEntity.status(302).header("Location", "/admin/images").build();
     }
-    
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login";
+
+    @GetMapping("/user")
+    @ResponseBody
+    public ResponseEntity<?> getUser(Principal principal) {
+        if (principal != null) {
+            return ResponseEntity.ok().body(Map.of("username", principal.getName()));
+        }
+        return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
     }
-    
-    @GetMapping("/register")
-    public String registerPage() {
-        return "register";
-    }
-    
+
     @GetMapping("/dashboard")
-    public String dashboard(Model model, Principal principal) {
+    @ResponseBody
+    public ResponseEntity<?> dashboard(Principal principal) {
+        Map<String, Object> response = new HashMap<>();
         // Add user information to model
         if (principal != null) {
-            model.addAttribute("username", principal.getName());
+            response.put("username", principal.getName());
         }
         // Add empty image list to model
-        model.addAttribute("images", new ArrayList<>());
-        return "dashboard";
+        response.put("images", new ArrayList<>());
+        return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/images")
-    public String listImages(Model model, Principal principal, @RequestParam(defaultValue = "") String path) {
+    @ResponseBody
+    public ResponseEntity<?> listImages(Principal principal, @RequestParam(defaultValue = "") String path) {
+        Map<String, Object> response = new HashMap<>();
         // Add user information to model
         if (principal != null) {
-            model.addAttribute("username", principal.getName());
+            response.put("username", principal.getName());
         }
 
         // Get image list from MinIO
@@ -86,7 +90,7 @@ public class AdminUIController {
                     .recursive(false)
                     .build()
             );
-            
+
             for (Result<Item> result : results) {
                 Item item = result.get();
                 String objectName = item.objectName();
@@ -118,7 +122,7 @@ public class AdminUIController {
                         finalObjectName = path + displayName + "/";
                     }
                 }
-                
+
                 ImageInfo imageInfo = new ImageInfo();
                 imageInfo.setFileName(displayName);
                 // Handle case where lastModified might be null
@@ -142,10 +146,10 @@ public class AdminUIController {
             // If getting image list fails, log error and use empty list
             e.printStackTrace();
         }
-        
-        model.addAttribute("images", images);
-        model.addAttribute("currentPath", path);
-        return "image-list";
+
+        response.put("images", images);
+        response.put("currentPath", path);
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/images/create-folder")
@@ -188,24 +192,27 @@ public class AdminUIController {
         }
     }
     
-    @GetMapping("/images/{id}")
-    public String viewImage(@PathVariable Long id, Model model, Principal principal) {
+    @GetMapping("/images/{path}")
+    @ResponseBody
+    public ResponseEntity<?> viewImage(@PathVariable String path, Principal principal) {
+        Map<String, Object> response = new HashMap<>();
         // Add user information to model
         if (principal != null) {
-            model.addAttribute("username", principal.getName());
+            response.put("username", principal.getName());
         }
-        // Add empty image object to model (simplified implementation)
-        model.addAttribute("image", new Object() {
-            public String getFileHash() { return "sample-hash"; }
-            public String getFileName() { return "sample.jpg"; }
-            public Integer getWidth() { return 800; }
-            public Integer getHeight() { return 600; }
-            public Long getFileSize() { return 102400L; }
-            public String getContentType() { return "image/jpeg"; }
-            public String getCreatedAt() { return "2023-01-01 12:00:00"; }
-            public String getFilePath() { return "/path/to/sample.jpg"; }
-        });
-        return "image-view";
+        // Add image object to response (simplified implementation)
+        Map<String, Object> image = new HashMap<>();
+        image.put("id", path);
+        image.put("fileHash", "sample-hash");
+        image.put("fileName", "sample.jpg");
+        image.put("width", 800);
+        image.put("height", 600);
+        image.put("fileSize", 102400L);
+        image.put("contentType", "image/jpeg");
+        image.put("createdAt", "2023-01-01 12:00:00");
+        image.put("filePath", "/admin/images/" + path);
+        response.put("image", image);
+        return ResponseEntity.ok(response);
     }
 
     // Add endpoint to view image directly
