@@ -10,6 +10,12 @@
 **ImgFlux** - 高性能图片处理框架，支持 GPU 加速和 GraphicsMagick，每分钟可处理 10,000 张图片。批量背景移除的 remove.bg
 开源替代方案。
 
+## 架构图
+
+上传流程和缩略图下载流程彼此独立，两个流程中只有对象存储是共享组件。
+
+![ImgFlux 架构图](assets/architecture-zh-CN.svg.png)
+
 ## 功能特性
 
 - 🚀 **图片上传API** - 支持多种图片格式上传

@@ -10,6 +10,14 @@
 **ImgFlux** - High-performance image processing framework that processes 10,000 images/minute with GPU acceleration and
 GraphicsMagick. Open-source alternative to remove.bg for bulk background removal.
 
+## Architecture
+
+The upload flow and thumbnail download flow are separated. Object storage is the only shared component between the two
+flows.
+
+![ImgFlux Architecture](doc/assets/architecture-en.svg.png)
+
+
 ## Features
 
 - 🚀 **Image Upload API** - Support multiple image formats
