@@ -24,7 +24,7 @@ img-flux:
 # Image processing configuration
   image:
     max-size: 10485760 # 10MB in bytes
-    supported-formats: JPG,JPEG,PNG,GIF,AVIF
+    supported-formats: JPG,JPEG,PNG,GIF,AVIF,WEBP
 
   # GraphicsMagick configuration for testing
   gm:

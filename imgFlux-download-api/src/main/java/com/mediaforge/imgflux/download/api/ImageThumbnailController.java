@@ -1,9 +1,13 @@
 package com.mediaforge.imgflux.download.api;
 
+import com.mediaforge.imgflux.download.utils.ResizeParamParser;
+import com.mediaforge.imgflux.download.utils.ResizePathUtils;
 import com.mediaforge.imgflux.engine.gm.ImageProcessingService;
+import com.mediaforge.imgflux.engine.gm.ThumbnailDefinition;
 import com.mediaforge.imgflux.engine.service.cdn.CdnService;
 import com.mediaforge.imgflux.engine.service.storage.ObjectStorageService;
 import jakarta.servlet.http.HttpServletRequest;
+import com.mediaforge.imgflux.download.utils.ResizePathUtils.ResizePath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +35,9 @@ public class ImageThumbnailController {
     
     @Value("${img-flux.storage.bucket.name:original-image}")
     private String bucketName;
+
+    @Value("${img-flux.image.supported-formats:JPG,JPEG,PNG,GIF,AVIF,WEBP}")
+    private String supportedFormats;
     
     /**
      * View image - Get original image from MinIO server using image path as parameter
@@ -114,6 +122,36 @@ public class ImageThumbnailController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping({"/resize/{resize_param}/{path}", "/resize/{resize_param}/**"})
+    public ResponseEntity<byte[]> resizeImage(
+            HttpServletRequest request,
+            @PathVariable("resize_param") String resizeParam) {
+        try {
+            ThumbnailDefinition definition = ResizeParamParser.parseResizeParam(resizeParam);
+            String imagePath = ResizePathUtils.extractResizeImagePath(request, resizeParam);
+            ResizePath resizePath = ResizePathUtils.parseResizePath(imagePath, supportedFormats);
+
+            byte[] originalImageData = objectStorageService.downloadFile(bucketName, resizePath.sourcePath());
+            definition.setImageData(originalImageData);
+            definition.setFormat(resizePath.targetFormat());
+
+            byte[] processedImageData = imageProcessingService.processImage(definition);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(getContentType(definition.getFormat())));
+            if (processedImageData != null) {
+                headers.setContentLength(processedImageData.length);
+            }
+
+            return new ResponseEntity<>(processedImageData, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     
     /**
      * Get content type based on format
@@ -129,8 +167,11 @@ public class ImageThumbnailController {
                 return "image/gif";
             case "AVIF":
                 return "image/avif";
+            case "WEBP":
+                return "image/webp";
             default:
                 return "image/jpeg";
         }
     }
+
 }

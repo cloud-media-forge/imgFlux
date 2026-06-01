@@ -120,6 +120,27 @@ mvn spring-boot:run -pl imgFlux-download-api
 mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
+### 上传图片并生成缩略图
+
+上传图片：
+
+```bash
+curl http://localhost:8080/api/v1/upload/xxxx/xx.png
+```
+
+返回值中的路径为：
+
+```text
+xxxx/xx.png
+```
+
+使用 upload 返回的 `path` 生成缩略图：
+
+```bash
+path=xxxx/xx.png
+curl http://localhost:8080/api/v1/resize/240x240q90trim/${path}
+```
+
 ## 技术栈
 
 - **Spring Boot 3.3** - 应用框架

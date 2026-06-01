@@ -122,6 +122,28 @@ mvn spring-boot:run -pl imgFlux-download-api
 mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
+### Upload and Generate Thumbnail
+
+Upload an image:
+
+```bash
+curl http://localhost:8080/api/v1/upload/xxxx/xx.png
+```
+
+The response path is:
+
+```text
+xxxx/xx.png
+```
+
+Use the returned `path` to generate a thumbnail:
+
+```bash
+path=xxxx/xx.png.webp
+curl http://localhost:8080/api/v1/resize/240x240q90trim/${path}
+// it will return an image with size=240x240, quality=90, convert format from png to webp 
+```
+
 
 ## Tech Stack
 

@@ -18,4 +18,6 @@ public interface ImageProcessingService {
      */
     byte[] processImage(byte[] imageData, int width, int height, int quality, 
                        boolean extent, boolean trim, String format);
+
+    byte[] processImage(ThumbnailDefinition definition);
 }

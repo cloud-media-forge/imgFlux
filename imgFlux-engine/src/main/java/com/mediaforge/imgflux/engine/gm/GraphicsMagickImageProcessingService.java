@@ -27,4 +27,16 @@ public class GraphicsMagickImageProcessingService implements ImageProcessingServ
             throw new RuntimeException("Failed to process image", e);
         }
     }
+
+    @Override
+    public byte[] processImage(ThumbnailDefinition definition) {
+        return processImage(
+                definition.getImageData(),
+                definition.getWidth(),
+                definition.getHeight(),
+                definition.getQuality(),
+                definition.isExtent(),
+                definition.isTrim(),
+                definition.getFormat());
+    }
 }

@@ -3,11 +3,13 @@ package com.mediaforge.imgflux.download.api;
 import java.lang.reflect.Field;
 
 import com.mediaforge.imgflux.engine.gm.ImageProcessingService;
+import com.mediaforge.imgflux.engine.gm.ThumbnailDefinition;
 import com.mediaforge.imgflux.engine.service.cdn.CdnService;
 import com.mediaforge.imgflux.engine.service.storage.ObjectStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -48,6 +50,10 @@ public class ImageDownloadControllerTest {
         Field bucketNameField = ImageThumbnailController.class.getDeclaredField("bucketName");
         bucketNameField.setAccessible(true);
         bucketNameField.set(imageDownloadController, "original-image");
+
+        Field supportedFormatsField = ImageThumbnailController.class.getDeclaredField("supportedFormats");
+        supportedFormatsField.setAccessible(true);
+        supportedFormatsField.set(imageDownloadController, "JPG,JPEG,PNG,GIF,AVIF,WEBP");
     }
 
     @Test
@@ -149,6 +155,40 @@ public class ImageDownloadControllerTest {
 
         // Verify ImageProcessingService method was not called
         verify(imageProcessingService, never()).processImage(any(), anyInt(), anyInt(), anyInt(), anyBoolean(), anyBoolean(), anyString());
+    }
+
+    @Test
+    public void testResizeImage_SuccessWithPathParamsAndFormatConversion() throws Exception {
+        String imagePath = "test/image.jpg.webp";
+        String sourcePath = "test/image.jpg";
+        byte[] originalImageData = "original image data".getBytes();
+        byte[] processedImageData = "processed image data".getBytes();
+
+        when(objectStorageService.downloadFile("original-image", sourcePath)).thenReturn(originalImageData);
+        when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/100x200q-75extrim/" + imagePath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "100x200q-75extrim");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals((Long)(long)processedImageData.length, response.getHeaders().getContentLength());
+        assertEquals("image/webp", response.getHeaders().getContentType().toString());
+        assertArrayEquals(processedImageData, response.getBody());
+
+        verify(objectStorageService).downloadFile("original-image", sourcePath);
+        ArgumentCaptor<ThumbnailDefinition> captor = ArgumentCaptor.forClass(ThumbnailDefinition.class);
+        verify(imageProcessingService).processImage(captor.capture());
+        ThumbnailDefinition definition = captor.getValue();
+        assertArrayEquals(originalImageData, definition.getImageData());
+        assertEquals(100, definition.getWidth());
+        assertEquals(200, definition.getHeight());
+        assertEquals(75, definition.getQuality());
+        assertEquals(true, definition.isExtent());
+        assertEquals(true, definition.isTrim());
+        assertEquals("WEBP", definition.getFormat());
     }
     
     @Test
