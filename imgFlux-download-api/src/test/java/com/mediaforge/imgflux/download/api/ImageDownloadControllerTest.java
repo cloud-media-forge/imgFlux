@@ -20,9 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -97,7 +94,7 @@ public class ImageDownloadControllerTest {
         when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
 
         // Mock ImageProcessingService behavior
-        when(imageProcessingService.processImage(originalImageData, 100, 100, 80, false, false, "JPG", "", ""))
+        when(imageProcessingService.processImage(any(ThumbnailDefinition.class)))
             .thenReturn(processedImageData);
 
         // Create mock HttpServletRequest
@@ -122,7 +119,14 @@ public class ImageDownloadControllerTest {
         verify(objectStorageService).downloadFile("original-image", imagePath);
 
         // Verify ImageProcessingService method was called
-        verify(imageProcessingService).processImage(originalImageData, 100, 100, 80, false, false, "JPG", "", "");
+        ArgumentCaptor<ThumbnailDefinition> captor = ArgumentCaptor.forClass(ThumbnailDefinition.class);
+        verify(imageProcessingService).processImage(captor.capture());
+        ThumbnailDefinition def = captor.getValue();
+        assertArrayEquals(originalImageData, def.getImageData());
+        assertEquals(100, def.getWidth());
+        assertEquals(100, def.getHeight());
+        assertEquals(80, def.getQuality());
+        assertEquals("JPG", def.getFormat());
     }
     
     @Test
@@ -154,8 +158,7 @@ public class ImageDownloadControllerTest {
         verify(objectStorageService).downloadFile("original-image", imagePath);
 
         // Verify ImageProcessingService method was not called
-        verify(imageProcessingService, never()).processImage(
-                any(), anyInt(), anyInt(), anyInt(), anyBoolean(), anyBoolean(), anyString(), anyString(), anyString());
+        verify(imageProcessingService, never()).processImage(any(ThumbnailDefinition.class));
     }
 
     @Test
@@ -165,7 +168,7 @@ public class ImageDownloadControllerTest {
         byte[] processedImageData = "translated image data".getBytes();
 
         when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
-        when(imageProcessingService.processImage(originalImageData, 0, 0, 80, false, false, "JPG", "ko", "zh-CN"))
+        when(imageProcessingService.processImage(any(ThumbnailDefinition.class)))
             .thenReturn(processedImageData);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -178,7 +181,11 @@ public class ImageDownloadControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertArrayEquals(processedImageData, response.getBody());
 
-        verify(imageProcessingService).processImage(originalImageData, 0, 0, 80, false, false, "JPG", "ko", "zh-CN");
+        ArgumentCaptor<ThumbnailDefinition> captor = ArgumentCaptor.forClass(ThumbnailDefinition.class);
+        verify(imageProcessingService).processImage(captor.capture());
+        ThumbnailDefinition def = captor.getValue();
+        assertEquals("ko", def.getSrcLang());
+        assertEquals("zh-CN", def.getToLang());
     }
 
     @Test

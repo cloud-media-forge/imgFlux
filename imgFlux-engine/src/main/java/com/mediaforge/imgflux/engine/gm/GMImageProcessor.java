@@ -26,14 +26,18 @@ public class GMImageProcessor {
     
     /**
      * Process image using GMConnection and GMBatchCommand
-     * @param imageData Original image data
-     * @param width Target width
-     * @param height Target height
-     * @param quality Image quality
+     * @param def Thumbnail definition containing image data and processing parameters
      * @return Processed image data
      */
-    public byte[] processImageWithBatchCommand(
-            byte[] imageData, int width, int height, int quality, String format, String srcLang, String toLang) throws Exception {
+    public byte[] processImageWithBatchCommand(ThumbnailDefinition def) throws Exception {
+        byte[] imageData = def.getImageData();
+        int width = def.getWidth();
+        int height = def.getHeight();
+        int quality = def.getQuality();
+        String srcLang = def.getSrcLang();
+        String toLang = def.getToLang();
+        String format = def.getFormat();
+
         GMConnection connection = null;
         File tempInputFile = null;
         File tempOutputFile = null;
@@ -89,59 +93,4 @@ public class GMImageProcessor {
         }
     }
     
-    /**
-     * Process image using GMConnection
-     * @param imageData Original image data
-     * @param width Target width
-     * @param height Target height
-     * @param quality Image quality
-     * @return Processed image data
-     */
-    public byte[] processImageWithConnection(byte[] imageData, int width, int height, int quality) throws Exception {
-        GMConnection connection = null;
-        File tempInputFile = null;
-        File tempOutputFile = null;
-        
-        try {
-            // 获取GM连接
-            connection = gmService.getConnection();
-            
-            // 创建临时文件
-            tempInputFile = File.createTempFile("gm_input_", ".tmp");
-            tempOutputFile = File.createTempFile("gm_output_", ".tmp");
-            
-            // 将输入数据写入临时文件
-            try (FileOutputStream fos = new FileOutputStream(tempInputFile)) {
-                fos.write(imageData);
-            }
-            
-            // 执行多个GM命令
-            connection.execute("convert", 
-                tempInputFile.getAbsolutePath(),
-                "-resize", width + "x" + height,
-                "-quality", String.valueOf(quality),
-                tempOutputFile.getAbsolutePath());
-            
-            // 读取输出文件
-            byte[] result;
-            try (FileInputStream fis = new FileInputStream(tempOutputFile)) {
-                result = fis.readAllBytes();
-            }
-            
-            return result;
-        } finally {
-            // 关闭连接
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception e) {
-                    logger.warn("Failed to close GM connection", e);
-                }
-            }
-            
-            // 清理临时文件
-            if (tempInputFile != null) tempInputFile.delete();
-            if (tempOutputFile != null) tempOutputFile.delete();
-        }
-    }
 }

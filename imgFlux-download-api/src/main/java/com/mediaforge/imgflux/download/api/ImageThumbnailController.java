@@ -106,8 +106,17 @@ public class ImageThumbnailController {
             }
 
             // Use image processing service to process image
-            byte[] processedImageData = imageProcessingService.processImage(
-                    originalImageData, width, height, quality, extent, trim, format, srcLang, toLang);
+            ThumbnailDefinition definition = new ThumbnailDefinition();
+            definition.setImageData(originalImageData);
+            definition.setWidth(width);
+            definition.setHeight(height);
+            definition.setQuality(quality);
+            definition.setExtent(extent);
+            definition.setTrim(trim);
+            definition.setFormat(format);
+            definition.setSrcLang(srcLang);
+            definition.setToLang(toLang);
+            byte[] processedImageData = imageProcessingService.processImage(definition);
 
             // Determine content type
             String contentType = getContentType(format);

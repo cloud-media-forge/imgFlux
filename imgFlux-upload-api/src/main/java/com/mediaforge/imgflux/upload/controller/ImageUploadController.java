@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.mediaforge.imgflux.engine.gm.ImageProcessingService;
+import com.mediaforge.imgflux.engine.gm.ThumbnailDefinition;
 import com.mediaforge.imgflux.engine.service.cdn.CdnService;
 import com.mediaforge.imgflux.engine.service.storage.ObjectStorageService;
 import com.mediaforge.imgflux.engine.service.util.HashUtil;
@@ -91,8 +92,15 @@ public class ImageUploadController {
             byte[] originalImageData = file.getBytes();
 
             // Process image
-            byte[] processedImageData = imageProcessingService.processImage(
-                    originalImageData, width, height, quality, extent, trim, format);
+            ThumbnailDefinition definition = new ThumbnailDefinition();
+            definition.setImageData(originalImageData);
+            definition.setWidth(width);
+            definition.setHeight(height);
+            definition.setQuality(quality);
+            definition.setExtent(extent);
+            definition.setTrim(trim);
+            definition.setFormat(format);
+            byte[] processedImageData = imageProcessingService.processImage(definition);
 
             // Calculate hash value
             String hash = HashUtil.calculateHash(processedImageData);
