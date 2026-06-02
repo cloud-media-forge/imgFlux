@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TextTranslationIntegrationTest {
 
     private static final String RESOURCE_DIR = "src/test/resources/translate/src";
-    private static final String OUT_DIR = "src/test/resources/translate/out";
+    private static final String OUT_DIR = "src/test/resources/translate/output";
     private static final String SRC_LANG = "ko";
 
     private TextTranslationService service;

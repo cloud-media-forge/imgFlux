@@ -40,32 +40,32 @@
 
 ## 图片处理效果展示
 
-| Features                    | Original Image | After Operation |
-|-----------------------------|----------------|-----------------|
-| **改变尺寸**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg) |
-| **独钓白边让主体更大**               | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg) |
-| **扩展图片**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg) |
-| **尺寸不变压缩质量**                | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg) |
-| **图片文字翻译** (Korean→English) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg) |
-| **图片文字翻译** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/out/C2-1BIG-zh-CN-result.jpg)                  |
+| Features                    | Original Image | After Operation                                                                                       |
+|-----------------------------|----------------|-------------------------------------------------------------------------------------------------------|
+| **改变尺寸**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg)             |
+| **独钓白边让主体更大**               | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg)                       |
+| **扩展图片**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg)            |
+| **尺寸不变压缩质量**                | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg)                  |
+| **图片文字翻译** (Korean→English) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
+| **图片文字翻译** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
 
 ## 图像功能规划
 
 我们计划添加 AI 驱动的图像处理功能。
 
-| 功能       | 描述             | 状态     |
-|----------|----------------|--------|
-| 背景移除     | 自动移除图片背景       | ✅ 支持   |
+| 功能       | 描述        | 状态     |
+|----------|-----------|--------|
+| 背景移除     | 自动移除图片背景  | ✅ 支持   |
 | 图片无损压缩   | 减少CDN成本、网络传输带宽 | ✅ 支持   |
-| 自动剪裁白边   | 让图像主体看起来更大     | ✅ 支持   |
-| OCR 增强   | 增强图片以提升文字识别效果  | 📋 计划中 |
-| 图片放大     | 使用 AI 放大图片     | 📋 计划中 |
-| 图片去重     | 检测并删除重复图片      | 📋 计划中 |
-| 添加水印     | 给图片添加水印        | 📋 计划中 |
-| 水印移除     | 移除图片中的水印       | 📋 计划中 |
-| 人脸匿名化    | 模糊或匿名化图片中的人脸   | 📋 计划中 |
-| PDF/图片清理 | 清理扫描文档         | 📋 计划中 |
-| 截图翻译     | 翻译截图中的文字       | 📋 计划中 |
+| 自动剪裁白边   | 让图像主体看起来更大 | ✅ 支持   |
+| 图片文字翻译   | 翻译截图中的文字  | ✅ 支持   |
+| 图片放大     |  放大图片     | ✅ 支持   |
+| OCR 增强   | 增强图片以提升文字识别效果 | 📋 计划中 |
+| 图片去重     | 检测并删除重复图片 | 📋 计划中 |
+| 添加水印     | 给图片添加水印   | 📋 计划中 |
+| 水印移除     | 移除图片中的水印  | 📋 计划中 |
+| 人脸匿名化    | 模糊或匿名化图片中的人脸 | 📋 计划中 |
+| PDF/图片清理 | 清理扫描文档    | 📋 计划中 |
 | 漫画/漫画增强  | 增强漫画和漫画图片      | 📋 计划中 |
 
 ## 性能基准测试
