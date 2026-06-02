@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +36,9 @@ public class ImageDownloadControllerTest {
 
     @Mock
     private CdnService cdnService;
+
+    @Mock
+    private RestTemplate restTemplate;
 
     @InjectMocks
     private ImageThumbnailController imageDownloadController;
@@ -99,11 +103,11 @@ public class ImageDownloadControllerTest {
 
         // Create mock HttpServletRequest
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/local/" + imagePath);
 
-        // Call the method under test
-        ResponseEntity<byte[]> response = imageDownloadController.forge(
-            request, 100, 100, 80, false, false, "JPG", "", "");
+        // Call the method under test with mode parameter
+        ResponseEntity<byte[]> response = imageDownloadController.resize(
+            request, "local", 100, 100, 80, false, false, "JPG", "", "");
 
         // Verify results
         assertNotNull(response);
@@ -140,11 +144,11 @@ public class ImageDownloadControllerTest {
 
         // Create mock HttpServletRequest
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/local/" + imagePath);
 
         // Call the method under test without specifying processing parameters (use default values)
-        ResponseEntity<byte[]> response = imageDownloadController.forge(
-            request, 0, 0, 80, false, false, "JPG", "", "");
+        ResponseEntity<byte[]> response = imageDownloadController.resize(
+            request, "local", 0, 0, 80, false, false, "JPG", "", "");
 
         // Verify results
         assertNotNull(response);
@@ -172,10 +176,10 @@ public class ImageDownloadControllerTest {
             .thenReturn(processedImageData);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/local/" + imagePath);
 
-        ResponseEntity<byte[]> response = imageDownloadController.forge(
-            request, 0, 0, 80, false, false, "JPG", "ko", "zh-CN");
+        ResponseEntity<byte[]> response = imageDownloadController.resize(
+            request, "local", 0, 0, 80, false, false, "JPG", "ko", "zh-CN");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -199,9 +203,9 @@ public class ImageDownloadControllerTest {
         when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/100x200q-75extrimrans:ko:zh-CN/" + imagePath);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/local/100x200q-75extrimrans:ko:zh-CN/" + imagePath);
 
-        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "100x200q-75extrimrans:ko:zh-CN");
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "local", "100x200q-75extrimrans:ko:zh-CN");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -246,5 +250,97 @@ public class ImageDownloadControllerTest {
 
         // Verify ObjectStorageService method was called
         verify(objectStorageService).downloadFile("original-image", imagePath);
+    }
+
+    @Test
+    public void testResize_RemoteMode_DownloadsFromRemote() throws Exception {
+        String remoteUrlInPath = "https:/example.com/image.jpg"; // Spring strips one slash
+        String fixedRemoteUrl = "https://example.com/image.jpg"; // Controller fixes it
+        byte[] originalImageData = "remote image data".getBytes();
+        byte[] processedImageData = "processed image data".getBytes();
+
+        when(restTemplate.getForObject(fixedRemoteUrl, byte[].class)).thenReturn(originalImageData);
+        when(imageProcessingService.processImage(any(ThumbnailDefinition.class)))
+            .thenReturn(processedImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/remote/" + remoteUrlInPath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.resize(
+            request, "remote", 100, 100, 80, false, false, "JPG", "", "");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertArrayEquals(processedImageData, response.getBody());
+
+        verify(restTemplate).getForObject(fixedRemoteUrl, byte[].class);
+        verify(objectStorageService, never()).downloadFile(any(), any());
+
+        ArgumentCaptor<ThumbnailDefinition> captor = ArgumentCaptor.forClass(ThumbnailDefinition.class);
+        verify(imageProcessingService).processImage(captor.capture());
+        ThumbnailDefinition def = captor.getValue();
+        assertArrayEquals(originalImageData, def.getImageData());
+    }
+
+    @Test
+    public void testResizeImage_RemoteMode_DownloadsFromRemote() throws Exception {
+        String remoteUrlInPath = "https:/example.com/image.jpg"; // Spring strips one slash
+        String fixedRemoteUrl = "https://example.com/image.jpg"; // Controller fixes it
+        byte[] originalImageData = "remote image data".getBytes();
+        byte[] processedImageData = "processed image data".getBytes();
+
+        when(restTemplate.getForObject(fixedRemoteUrl, byte[].class)).thenReturn(originalImageData);
+        when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/remote/100x200q-75/" + remoteUrlInPath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "remote", "100x200q-75");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertArrayEquals(processedImageData, response.getBody());
+
+        verify(restTemplate).getForObject(fixedRemoteUrl, byte[].class);
+        verify(objectStorageService, never()).downloadFile(any(), any());
+
+        ArgumentCaptor<ThumbnailDefinition> captor = ArgumentCaptor.forClass(ThumbnailDefinition.class);
+        verify(imageProcessingService).processImage(captor.capture());
+        ThumbnailDefinition definition = captor.getValue();
+        assertArrayEquals(originalImageData, definition.getImageData());
+        assertEquals(100, definition.getWidth());
+        assertEquals(200, definition.getHeight());
+        assertEquals(75, definition.getQuality());
+    }
+
+    @Test
+    public void testResize_InvalidMode_ReturnsBadRequest() throws Exception {
+        String imagePath = "test/image.jpg";
+        byte[] originalImageData = "original image data".getBytes();
+
+        when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/invalid/" + imagePath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.resize(
+            request, "invalid", 100, 100, 80, false, false, "JPG", "", "");
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void testResizeImage_InvalidMode_ReturnsBadRequest() throws Exception {
+        String imagePath = "test/image.jpg";
+        byte[] originalImageData = "original image data".getBytes();
+
+        when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/invalid/100x200/" + imagePath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "invalid", "100x200");
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

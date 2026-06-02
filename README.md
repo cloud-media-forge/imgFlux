@@ -149,10 +149,26 @@ xxxx/xx.png
 
 Use the returned `path` to generate a thumbnail:
 
+**Local mode (image stored in object storage):**
 ```bash
 path=xxxx/xx.png.webp
-curl http://localhost:8080/api/v1/resize/240x240q90trim/${path}
+curl http://localhost:8080/api/v1/thumbnail/resize/local/240x240q90trim/${path}
 // it will return an image with size=240x240, quality=90, convert format from png to webp 
+```
+
+**Remote mode (image from remote URL):**
+```bash
+curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://example.com/image.jpg"
+// it will download the image from the remote URL and process it
+```
+
+**Alternative endpoint with query parameters:**
+```bash
+# Local mode
+curl "http://localhost:8080/api/v1/thumbnail/forge/local/folder/image.png?width=240&height=240&quality=90&format=webp"
+
+# Remote mode
+curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/image.jpg?width=240&height=240&quality=90&format=webp"
 ```
 
 

@@ -52,6 +52,12 @@ image:
   max-size: 10485760 # 10MB in bytes
   supported-formats: JPG,JPEG,PNG,GIF,AVIF,WEBP
 
+# Remote image download configuration
+img-flux:
+  remote:
+    connect-timeout: 5000
+    read-timeout: 30000
+
 # GraphicsMagick configuration
 gm:
   pool-size: 16 # 默认值为16

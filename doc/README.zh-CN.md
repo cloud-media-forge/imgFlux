@@ -147,9 +147,26 @@ xxxx/xx.png
 
 使用 upload 返回的 `path` 生成缩略图：
 
+**本地模式（图片存储在对象存储中）：**
 ```bash
-path=xxxx/xx.png
-curl http://localhost:8080/api/v1/resize/240x240q90trim/${path}
+path=xxxx/xx.png.webp
+curl http://localhost:8080/api/v1/thumbnail/resize/local/240x240q90trim/${path}
+// 它将返回一张尺寸为240x240、质量为90、从png格式转换为webp格式的图片
+```
+
+**远程模式（图片来自远程URL）：**
+```bash
+curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://example.com/image.jpg"
+// 它将从远程URL下载图片并进行处理
+```
+
+**使用查询参数的替代端点：**
+```bash
+# 本地模式
+curl "http://localhost:8080/api/v1/thumbnail/forge/local/folder/image.png?width=240&height=240&quality=90&format=webp"
+
+# 远程模式
+curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/image.jpg?width=240&height=240&quality=90&format=webp"
 ```
 
 ## 技术栈

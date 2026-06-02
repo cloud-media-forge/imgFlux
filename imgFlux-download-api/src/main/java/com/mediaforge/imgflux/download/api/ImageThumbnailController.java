@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/thumbnail")
@@ -32,7 +35,12 @@ public class ImageThumbnailController {
     
     @Autowired
     private CdnService cdnService;
-    
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private static final Set<String> VALID_MODES = Set.of("local", "remote");
+
     @Value("${img-flux.storage.bucket.name:original-image}")
     private String bucketName;
 
@@ -75,9 +83,10 @@ public class ImageThumbnailController {
      * Download image - First get original image from MinIO server using image path parameter,
      * then call image engine for image compression processing
      */
-    @GetMapping("/forge/**")
-    public ResponseEntity<byte[]> forge(
+    @GetMapping("/forge/{mode}/**")
+    public ResponseEntity<byte[]> resize(
             HttpServletRequest request,
+            @PathVariable("mode") String mode,
             @RequestParam(value = "width", required = false, defaultValue = "0") int width,
             @RequestParam(value = "height", required = false, defaultValue = "0") int height,
             @RequestParam(value = "quality", required = false, defaultValue = "80") int quality,
@@ -86,14 +95,17 @@ public class ImageThumbnailController {
             @RequestParam(value = "format", required = false, defaultValue = "JPG") String format,
             @RequestParam(value = "srcLang", required = false, defaultValue = "") String srcLang,
             @RequestParam(value = "toLang", required = false, defaultValue = "") String toLang) {
-        
+
         try {
+            validateMode(mode);
+
             // Extract image path from request path
             String requestUri = request.getRequestURI();
-            String imagePath = requestUri.substring("/api/v1/thumbnail/forge/".length());
+            String prefix = "/api/v1/thumbnail/forge/" + mode + "/";
+            String imagePath = requestUri.substring(prefix.length());
 
-            // Download original image from MinIO
-            byte[] originalImageData = objectStorageService.downloadFile(bucketName, imagePath);
+            // Download original image
+            byte[] originalImageData = downloadImage(mode, imagePath);
 
             // If no processing parameters are specified, return original image directly
             if (width == 0 && height == 0 && quality == 80 && !extent && !trim && 
@@ -129,22 +141,27 @@ public class ImageThumbnailController {
             
             return new ResponseEntity<>(processedImageData, headers, HttpStatus.OK);
             
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping({"/resize/{resize_param}/{path}", "/resize/{resize_param}/**"})
+    @GetMapping({"/resize/{mode}/{resize_param}/{path}", "/resize/{mode}/{resize_param}/**"})
     public ResponseEntity<byte[]> resizeImage(
             HttpServletRequest request,
+            @PathVariable("mode") String mode,
             @PathVariable("resize_param") String resizeParam) {
         try {
+            validateMode(mode);
+
             ThumbnailDefinition definition = ResizeParamParser.parseResizeParam(resizeParam);
-            String imagePath = ResizePathUtils.extractResizeImagePath(request, resizeParam);
+            String imagePath = ResizePathUtils.extractResizeImagePath(request, mode, resizeParam);
             ResizePath resizePath = ResizePathUtils.parseResizePath(imagePath, supportedFormats);
 
-            byte[] originalImageData = objectStorageService.downloadFile(bucketName, resizePath.sourcePath());
+            byte[] originalImageData = downloadImage(mode, resizePath.sourcePath());
             definition.setImageData(originalImageData);
             definition.setFormat(resizePath.targetFormat());
 
@@ -190,6 +207,21 @@ public class ImageThumbnailController {
         return srcLang != null && !srcLang.isBlank()
                 && toLang != null && !toLang.isBlank()
                 && !srcLang.equalsIgnoreCase(toLang);
+    }
+
+    private byte[] downloadImage(String mode, String path) {
+        if ("remote".equals(mode)) {
+            // Fix URL encoding issue: Spring strips one slash from https:// in path
+            String fixedPath = path.replaceFirst("^https:/", "https://");
+            return restTemplate.getForObject(fixedPath, byte[].class);
+        }
+        return objectStorageService.downloadFile(bucketName, path);
+    }
+
+    private void validateMode(String mode) {
+        if (!VALID_MODES.contains(mode)) {
+            throw new IllegalArgumentException("Invalid mode: " + mode + ". Must be 'local' or 'remote'.");
+        }
     }
 
 }

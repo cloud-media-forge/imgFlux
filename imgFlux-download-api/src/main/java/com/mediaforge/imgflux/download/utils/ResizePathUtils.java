@@ -10,8 +10,8 @@ public final class ResizePathUtils {
     private ResizePathUtils() {
     }
 
-    public static String extractResizeImagePath(HttpServletRequest request, String resizeParam) {
-        String prefix = "/api/v1/thumbnail/resize/" + resizeParam + "/";
+    public static String extractResizeImagePath(HttpServletRequest request, String mode, String resizeParam) {
+        String prefix = "/api/v1/thumbnail/resize/" + mode + "/" + resizeParam + "/";
         String requestUri = request.getRequestURI();
         if (!requestUri.startsWith(prefix)) {
             throw new IllegalArgumentException("Invalid resize path");
