@@ -18,10 +18,10 @@ public class GraphicsMagickImageProcessingService implements ImageProcessingServ
     
     @Override
     public byte[] processImage(byte[] imageData, int width, int height, int quality, 
-                              boolean extent, boolean trim, String format) {
+                              boolean extent, boolean trim, String format, String srcLang, String toLang) {
         try {
             // 使用GMBatchCommand处理图片
-            return gmImageProcessor.processImageWithBatchCommand(imageData, width, height, quality);
+            return gmImageProcessor.processImageWithBatchCommand(imageData, width, height, quality, format, srcLang, toLang);
         } catch (Exception e) {
             logger.error("Error processing image", e);
             throw new RuntimeException("Failed to process image", e);
@@ -37,6 +37,8 @@ public class GraphicsMagickImageProcessingService implements ImageProcessingServ
                 definition.getQuality(),
                 definition.isExtent(),
                 definition.isTrim(),
-                definition.getFormat());
+                definition.getFormat(),
+                definition.getSrcLang(),
+                definition.getToLang());
     }
 }

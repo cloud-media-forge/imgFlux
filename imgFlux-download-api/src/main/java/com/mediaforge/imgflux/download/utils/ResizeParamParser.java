@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public final class ResizeParamParser {
 
     public static final Pattern VALID_ID_PATTERN =
-            Pattern.compile("^(([0-9]*)x?([0-9]*))?(q-?\\d+)?(ex)?(trim|shave)?$");
+            Pattern.compile("^(([0-9]*)x?([0-9]*))?(q-?\\d+)?(ex)?(trim|shave)?(?:rans:([^:]*):([^:]*))?$");
 
     private ResizeParamParser() {
     }
@@ -24,6 +24,8 @@ public final class ResizeParamParser {
         definition.setQuality(parseQuality(matcher.group(4)));
         definition.setExtent(matcher.group(5) != null);
         definition.setTrim(matcher.group(6) != null);
+        definition.setSrcLang(defaultString(matcher.group(7)));
+        definition.setToLang(defaultString(matcher.group(8)));
         return definition;
     }
 
@@ -39,5 +41,9 @@ public final class ResizeParamParser {
             return defaultValue;
         }
         return Integer.parseInt(value);
+    }
+
+    private static String defaultString(String value) {
+        return value == null ? "" : value;
     }
 }

@@ -45,7 +45,7 @@ public class ImageThumbnailControllerIntegrationTest {
         when(imageProcessingService.processImage(any(ThumbnailDefinition.class)))
                 .thenReturn(processedImageData);
 
-        mockMvc.perform(get("/api/v1/thumbnail/resize/120x80q-70extrim/folder/image.png.webp"))
+        mockMvc.perform(get("/api/v1/thumbnail/resize/120x80q-70extrimrans:ja:en/folder/image.png.webp"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "image/webp"))
                 .andExpect(content().bytes(processedImageData));
@@ -60,5 +60,7 @@ public class ImageThumbnailControllerIntegrationTest {
         assertEquals(true, definition.isExtent());
         assertEquals(true, definition.isTrim());
         assertEquals("WEBP", definition.getFormat());
+        assertEquals("ja", definition.getSrcLang());
+        assertEquals("en", definition.getToLang());
     }
 }

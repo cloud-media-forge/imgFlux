@@ -1,5 +1,6 @@
 package com.mediaforge.imgflux.engine.gm;
 
+import com.mediaforge.imgflux.engine.service.translate.TextTranslationService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +20,9 @@ public class GMImageProcessor {
     
     @Autowired
     private Gm4JavaBatchCommand gmService;
+
+    @Autowired
+    private TextTranslationService textTranslationService;
     
     /**
      * Process image using GMConnection and GMBatchCommand
@@ -28,7 +32,8 @@ public class GMImageProcessor {
      * @param quality Image quality
      * @return Processed image data
      */
-    public byte[] processImageWithBatchCommand(byte[] imageData, int width, int height, int quality) throws Exception {
+    public byte[] processImageWithBatchCommand(
+            byte[] imageData, int width, int height, int quality, String format, String srcLang, String toLang) throws Exception {
         GMConnection connection = null;
         File tempInputFile = null;
         File tempOutputFile = null;
@@ -52,7 +57,9 @@ public class GMImageProcessor {
             // 创建操作
             IMOperation op = new IMOperation();
             op.addImage(tempInputFile.getAbsolutePath());
-            op.resize(width, height);
+            if (width > 0 || height > 0) {
+                op.resize(width, height);
+            }
             op.quality((double) quality);
             op.addImage(tempOutputFile.getAbsolutePath());
             
@@ -65,7 +72,7 @@ public class GMImageProcessor {
                 result = fis.readAllBytes();
             }
             
-            return result;
+            return textTranslationService.translate(result, format, srcLang, toLang);
         } finally {
             // 关闭连接
             if (connection != null) {

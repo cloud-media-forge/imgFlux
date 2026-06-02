@@ -76,14 +76,16 @@ public class ImageThumbnailController {
      * then call image engine for image compression processing
      */
     @GetMapping("/forge/**")
-    public ResponseEntity<byte[]> downloadImage(
+    public ResponseEntity<byte[]> forge(
             HttpServletRequest request,
             @RequestParam(value = "width", required = false, defaultValue = "0") int width,
             @RequestParam(value = "height", required = false, defaultValue = "0") int height,
             @RequestParam(value = "quality", required = false, defaultValue = "80") int quality,
             @RequestParam(value = "extent", required = false, defaultValue = "false") boolean extent,
             @RequestParam(value = "trim", required = false, defaultValue = "false") boolean trim,
-            @RequestParam(value = "format", required = false, defaultValue = "JPG") String format) {
+            @RequestParam(value = "format", required = false, defaultValue = "JPG") String format,
+            @RequestParam(value = "srcLang", required = false, defaultValue = "") String srcLang,
+            @RequestParam(value = "toLang", required = false, defaultValue = "") String toLang) {
         
         try {
             // Extract image path from request path
@@ -95,7 +97,8 @@ public class ImageThumbnailController {
 
             // If no processing parameters are specified, return original image directly
             if (width == 0 && height == 0 && quality == 80 && !extent && !trim && 
-                ("JPG".equalsIgnoreCase(format) || "JPEG".equalsIgnoreCase(format))) {
+                ("JPG".equalsIgnoreCase(format) || "JPEG".equalsIgnoreCase(format)) &&
+                !hasTranslationRequest(srcLang, toLang)) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.parseMediaType(getContentType(format)));
                 headers.setContentLength(originalImageData.length);
@@ -104,7 +107,7 @@ public class ImageThumbnailController {
 
             // Use image processing service to process image
             byte[] processedImageData = imageProcessingService.processImage(
-                    originalImageData, width, height, quality, extent, trim, format);
+                    originalImageData, width, height, quality, extent, trim, format, srcLang, toLang);
 
             // Determine content type
             String contentType = getContentType(format);
@@ -172,6 +175,12 @@ public class ImageThumbnailController {
             default:
                 return "image/jpeg";
         }
+    }
+
+    private boolean hasTranslationRequest(String srcLang, String toLang) {
+        return srcLang != null && !srcLang.isBlank()
+                && toLang != null && !toLang.isBlank()
+                && !srcLang.equalsIgnoreCase(toLang);
     }
 
 }

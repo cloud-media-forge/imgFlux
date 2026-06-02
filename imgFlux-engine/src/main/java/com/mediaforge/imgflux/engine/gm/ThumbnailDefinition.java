@@ -9,6 +9,8 @@ public class ThumbnailDefinition {
     private boolean extent;
     private boolean trim;
     private String format;
+    private String srcLang;
+    private String toLang;
 
     public byte[] getImageData() {
         return imageData;
@@ -64,5 +66,21 @@ public class ThumbnailDefinition {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getSrcLang() {
+        return srcLang;
+    }
+
+    public void setSrcLang(String srcLang) {
+        this.srcLang = srcLang;
+    }
+
+    public String getToLang() {
+        return toLang;
+    }
+
+    public void setToLang(String toLang) {
+        this.toLang = toLang;
     }
 }

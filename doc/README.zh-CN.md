@@ -38,6 +38,17 @@
 | Docker支持 | ✅ 开箱即用           |
 | JWT认证    | ✅ 内置             |
 
+## 图片处理效果展示
+
+| Features                    | Original Image | After Operation |
+|-----------------------------|----------------|-----------------|
+| **改变尺寸**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg) |
+| **独钓白边让主体更大**               | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg) |
+| **扩展图片**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg) |
+| **尺寸不变压缩质量**                | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg) |
+| **图片文字翻译** (Korean→English) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg) |
+| **图片文字翻译** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/out/C2-1BIG-zh-CN-result.jpg)                  |
+
 ## 图像功能规划
 
 我们计划添加 AI 驱动的图像处理功能。

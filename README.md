@@ -40,6 +40,17 @@ flows.
 | Docker support        | ✅ Ready to use        | 
 | JWT auth              | ✅ Built-in            |
 
+## Image Processing Examples
+
+| Features                              | Original Image | After Operation                                                                             |
+|---------------------------------------|----------------|---------------------------------------------------------------------------------------------|
+| **Resize**                            | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg)   |
+| **Trim**                              | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg)             |
+| **Extent**                            | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg)  |
+| **Quality**                           | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg)        |
+| **Text Translation** (Korean→English) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg) |
+| **Text Translation** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/out/C2-1BIG-zh-CN-result.jpg)                  |
+| **Text Translation** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/out/C2-1BIG-zh-CN-result.jpg)                  |
 ## Image Flux Roadmap
 
 We're planning to add AI-powered image processing features. See [Wiki](../../wiki) for details:

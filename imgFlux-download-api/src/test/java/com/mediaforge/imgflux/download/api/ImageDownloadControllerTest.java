@@ -97,7 +97,7 @@ public class ImageDownloadControllerTest {
         when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
 
         // Mock ImageProcessingService behavior
-        when(imageProcessingService.processImage(originalImageData, 100, 100, 80, false, false, "JPG"))
+        when(imageProcessingService.processImage(originalImageData, 100, 100, 80, false, false, "JPG", "", ""))
             .thenReturn(processedImageData);
 
         // Create mock HttpServletRequest
@@ -105,8 +105,8 @@ public class ImageDownloadControllerTest {
         when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
 
         // Call the method under test
-        ResponseEntity<byte[]> response = imageDownloadController.downloadImage(
-            request, 100, 100, 80, false, false, "JPG");
+        ResponseEntity<byte[]> response = imageDownloadController.forge(
+            request, 100, 100, 80, false, false, "JPG", "", "");
 
         // Verify results
         assertNotNull(response);
@@ -122,7 +122,7 @@ public class ImageDownloadControllerTest {
         verify(objectStorageService).downloadFile("original-image", imagePath);
 
         // Verify ImageProcessingService method was called
-        verify(imageProcessingService).processImage(originalImageData, 100, 100, 80, false, false, "JPG");
+        verify(imageProcessingService).processImage(originalImageData, 100, 100, 80, false, false, "JPG", "", "");
     }
     
     @Test
@@ -139,8 +139,8 @@ public class ImageDownloadControllerTest {
         when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
 
         // Call the method under test without specifying processing parameters (use default values)
-        ResponseEntity<byte[]> response = imageDownloadController.downloadImage(
-            request, 0, 0, 80, false, false, "JPG");
+        ResponseEntity<byte[]> response = imageDownloadController.forge(
+            request, 0, 0, 80, false, false, "JPG", "", "");
 
         // Verify results
         assertNotNull(response);
@@ -154,7 +154,31 @@ public class ImageDownloadControllerTest {
         verify(objectStorageService).downloadFile("original-image", imagePath);
 
         // Verify ImageProcessingService method was not called
-        verify(imageProcessingService, never()).processImage(any(), anyInt(), anyInt(), anyInt(), anyBoolean(), anyBoolean(), anyString());
+        verify(imageProcessingService, never()).processImage(
+                any(), anyInt(), anyInt(), anyInt(), anyBoolean(), anyBoolean(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void testForgePassesTranslationLanguages() throws Exception {
+        String imagePath = "test/image.jpg";
+        byte[] originalImageData = "original image data".getBytes();
+        byte[] processedImageData = "translated image data".getBytes();
+
+        when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
+        when(imageProcessingService.processImage(originalImageData, 0, 0, 80, false, false, "JPG", "ko", "zh-CN"))
+            .thenReturn(processedImageData);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/forge/" + imagePath);
+
+        ResponseEntity<byte[]> response = imageDownloadController.forge(
+            request, 0, 0, 80, false, false, "JPG", "ko", "zh-CN");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertArrayEquals(processedImageData, response.getBody());
+
+        verify(imageProcessingService).processImage(originalImageData, 0, 0, 80, false, false, "JPG", "ko", "zh-CN");
     }
 
     @Test
@@ -168,9 +192,9 @@ public class ImageDownloadControllerTest {
         when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/100x200q-75extrim/" + imagePath);
+        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/100x200q-75extrimrans:ko:zh-CN/" + imagePath);
 
-        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "100x200q-75extrim");
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "100x200q-75extrimrans:ko:zh-CN");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -189,6 +213,8 @@ public class ImageDownloadControllerTest {
         assertEquals(true, definition.isExtent());
         assertEquals(true, definition.isTrim());
         assertEquals("WEBP", definition.getFormat());
+        assertEquals("ko", definition.getSrcLang());
+        assertEquals("zh-CN", definition.getToLang());
     }
     
     @Test
