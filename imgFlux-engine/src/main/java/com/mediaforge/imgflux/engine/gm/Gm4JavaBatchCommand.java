@@ -11,6 +11,7 @@ import org.gm4java.im4java.GMBatchCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,37 +52,13 @@ public class Gm4JavaBatchCommand {
         // PooledGMService does not require special shutdown handling
         logger.info("GM service destroyed");
     }
-    
-    /**
-     * Execute GM command
-     * @param command GM command
-     * @param arguments Command arguments
-     * @return Command execution result
-     * @throws GMException
-     */
-    public String execute(String command, String... arguments) throws Exception {
-        if (gmService == null) {
-            throw new IllegalStateException("GM service not initialized");
-        }
-        return gmService.execute(command, arguments);
-    }
-    
-    /**
-     * Get GM connection
-     * @return GM connection
-     * @throws Exception
-     */
-    public GMConnection getConnection() throws Exception {
-        if (gmService == null) {
-            throw new IllegalStateException("GM service not initialized");
-        }
-        return gmService.getConnection();
-    }
+
     
     /**
      * Get GMBatchCommand instance
      * @return GMBatchCommand instance
      */
+    @Bean
     public GMBatchCommand getGMBatchCommand() {
         if (gmBatchCommand == null) {
             throw new IllegalStateException("GMBatchCommand not initialized");

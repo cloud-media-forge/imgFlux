@@ -4,8 +4,9 @@ import com.mediaforge.imgflux.engine.service.translate.TextTranslationService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.security.MessageDigest;
 
-import org.gm4java.engine.GMConnection;
 import org.gm4java.im4java.GMBatchCommand;
 import org.im4java.core.IMOperation;
 import org.slf4j.Logger;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GMImageProcessor {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(GMImageProcessor.class);
-    
+
     @Autowired
-    private Gm4JavaBatchCommand gmService;
+    private GMBatchCommand gmBatchCommand;
 
     @Autowired
     private TextTranslationService textTranslationService;
@@ -38,58 +39,49 @@ public class GMImageProcessor {
         String toLang = def.getToLang();
         String format = def.getFormat();
 
-        GMConnection connection = null;
-        File tempInputFile = null;
-        File tempOutputFile = null;
-        
+        String hash = String.format("%08x",
+            new java.math.BigInteger(1, MessageDigest.getInstance("MD5").digest(imageData)).intValue());
+        long ts = System.currentTimeMillis();
+        Path tmpDir = Path.of(System.getProperty("java.io.tmpdir"));
+        File tempInputFile = tmpDir.resolve(hash + "_" + ts + ".tmp").toFile();
+        File tempOutputFile = tmpDir.resolve(hash + "_" + ts + ".tmp.out" + (def.getFormat() != null ? "." + def.getFormat() : "")).toFile();
+
         try {
-            // 获取GM连接
-            connection = gmService.getConnection();
-            
-            // 创建临时文件
-            tempInputFile = File.createTempFile("gm_input_", ".tmp");
-            tempOutputFile = File.createTempFile("gm_output_", ".tmp");
-            
-            // 将输入数据写入临时文件
             try (FileOutputStream fos = new FileOutputStream(tempInputFile)) {
                 fos.write(imageData);
             }
-            
-            // 使用GMBatchCommand执行命令
-            GMBatchCommand cmd = gmService.getGMBatchCommand();
-            
-            // 创建操作
+
             IMOperation op = new IMOperation();
             op.addImage(tempInputFile.getAbsolutePath());
             if (width > 0 || height > 0) {
                 op.resize(width, height);
             }
             op.quality((double) quality);
+            if (def.isTrim()){
+                op.trim();
+            }
+            if (def.isExtent()){
+                op.extent(width, height);
+            }
+            if (def.getFormat() != null){
+                op.format(def.getFormat());
+            }
+
             op.addImage(tempOutputFile.getAbsolutePath());
-            
-            // 执行命令
-            cmd.run(op);
-            
-            // 读取输出文件
+            gmBatchCommand.run(op);
+
             byte[] result;
             try (FileInputStream fis = new FileInputStream(tempOutputFile)) {
                 result = fis.readAllBytes();
             }
-            
+
             return textTranslationService.translate(result, format, srcLang, toLang);
+        } catch (Exception e) {
+            logger.error("processImage error", e);
+            return def.getImageData();
         } finally {
-            // 关闭连接
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception e) {
-                    logger.warn("Failed to close GM connection", e);
-                }
-            }
-            
-            // 清理临时文件
-            if (tempInputFile != null) tempInputFile.delete();
-            if (tempOutputFile != null) tempOutputFile.delete();
+            tempInputFile.delete();
+            tempOutputFile.delete();
         }
     }
     
