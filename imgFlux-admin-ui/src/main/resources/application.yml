@@ -31,7 +31,23 @@ img-flux:
         endpoint: http://localhost:9000
         access-key: minioadmin
         secret-key: minioadmin
+        bucket: your-bucket-name
         secure: false
+      # AWS S3 configuration
+      aws:
+        s3:
+          access-key: your-access-key-id
+          secret-access-key: your-secret-access-key
+          region: us-east-1
+          bucket: your-bucket-name
+
+      # Alibaba Cloud OSS configuration
+      alibaba:
+        oss:
+          access-key: your-access-key-id
+          secret-key: your-access-key-secret
+          endpoint: oss-cn-hangzhou.aliyuncs.com
+          bucket: your-bucket-name
 
   # CDN configuration
   cdn:

@@ -6,7 +6,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     graphicsmagick \
-    graphicsmagick-libmagick-dev-compat \
     openjdk-17-jdk \
     wget \
     curl \

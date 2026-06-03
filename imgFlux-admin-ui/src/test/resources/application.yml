@@ -25,7 +25,7 @@ minio:
 # AWS S3 configuration
 aws:
   s3:
-    access-key-id: your-access-key-id
+    access-key: your-access-key-id
     secret-access-key: your-secret-access-key
     region: us-east-1
     bucket: your-bucket-name
@@ -33,8 +33,8 @@ aws:
 # Alibaba Cloud OSS configuration
 alibaba:
   oss:
-    access-key-id: your-access-key-id
-    access-key-secret: your-access-key-secret
+    access-key: your-access-key-id
+    secret-key: your-access-key-secret
     endpoint: oss-cn-hangzhou.aliyuncs.com
     bucket: your-bucket-name
 

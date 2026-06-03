@@ -16,10 +16,10 @@ import java.io.InputStream;
 @ConditionalOnProperty(name = "img-flux.storage.type", havingValue = "aliyun")
 public class AliyunOssStorageService implements ObjectStorageService {
     
-    @Value("${img-flux.storage.options.alibaba.oss.access-key-id}")
+    @Value("${img-flux.storage.options.alibaba.oss.access-key}")
     private String accessKeyId;
     
-    @Value("${img-flux.storage.options.alibaba.oss.access-key-secret}")
+    @Value("${img-flux.storage.options.alibaba.oss.secret-key}")
     private String accessKeySecret;
     
     @Value("${img-flux.storage.options.alibaba.oss.endpoint}")

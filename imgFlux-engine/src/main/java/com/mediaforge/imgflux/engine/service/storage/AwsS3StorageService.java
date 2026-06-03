@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "img-flux.storage.type", havingValue = "aws")
 public class AwsS3StorageService implements ObjectStorageService {
     
-    @Value("${img-flux.storage.options.aws.s3.access-key-id}")
+    @Value("${img-flux.storage.options.aws.s3.access-key}")
     private String accessKeyId;
     
     @Value("${img-flux.storage.options.aws.s3.secret-access-key}")
