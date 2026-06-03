@@ -17,7 +17,6 @@ export JAVA_OPTS="$JAVA_OPTS \
         -Dcmdb.hostname=${__POD_NAME} \
         -Dcom.sun.management.jmxremote.rmi.port=11619 \
         -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:G1HeapRegionSize=8m -XX:+ParallelRefProcEnabled -XX:-ResizePLAB \
-        -verbose:gc -Xlog:gc:${APP_LOG_PATH}/gc/gc.`date '+%Y%m%d%H%M'`.log -Xlog:gc* \
         -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${APP_LOG_PATH}/gc/heapdump_`date '+%Y%m%d%H%M'`.hprof"
 export SERVER_PORT=${SERVER_PORT:-8080}
 
