@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.admin.ui.controller;
+package com.mediaforge.imgflux.upload.controller.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

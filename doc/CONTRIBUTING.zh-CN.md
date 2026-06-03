@@ -86,7 +86,6 @@ mvn test
 # 启动服务
 mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
-mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
 ## 许可证

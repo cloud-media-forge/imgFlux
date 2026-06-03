@@ -109,7 +109,6 @@ imgFlux/
 ├── image-process-engine/     # 图片处理公共库
 ├── imgFlux-upload-api/         # 图片上传REST API模块
 ├── imgFlux-download-api/       # 图片下载和resize模块
-├── imgFlux-admin-ui/           # Admin UI模块
 ```
 
 ## 快速开始
@@ -128,7 +127,6 @@ docker-compose up -d -f docker-compose-develop.yml
 mvn clean install
 mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
-mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
 ### 上传图片并生成缩略图

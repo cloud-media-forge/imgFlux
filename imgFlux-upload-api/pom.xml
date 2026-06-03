@@ -21,6 +21,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- Servlet API -->
+        <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+          <version>4.0.1</version>
+          <scope>provided</scope>
+        </dependency>
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,6 +119,77 @@
                 <configuration>
                     <mainClass>com.mediaforge.imgflux.upload.ImageUploadApplication</mainClass>
                 </configuration>
+            </plugin>
+
+            <!-- Frontend Maven Plugin -->
+            <plugin>
+              <groupId>com.github.eirslett</groupId>
+              <artifactId>frontend-maven-plugin</artifactId>
+              <version>1.14.2</version>
+              <configuration>
+                <workingDirectory>frontend</workingDirectory>
+                <installDirectory>target</installDirectory>
+              </configuration>
+              <executions>
+                <!-- Install Node and NPM -->
+                <execution>
+                  <id>install node and npm</id>
+                  <goals>
+                    <goal>install-node-and-npm</goal>
+                  </goals>
+                  <configuration>
+                    <nodeVersion>v18.16.0</nodeVersion>
+                    <npmVersion>9.5.1</npmVersion>
+                  </configuration>
+                </execution>
+
+                <!-- npm install -->
+                <execution>
+                  <id>npm install</id>
+                  <goals>
+                    <goal>npm</goal>
+                  </goals>
+                  <configuration>
+                    <arguments>install</arguments>
+                  </configuration>
+                </execution>
+
+                <!-- npm run build -->
+                <execution>
+                  <id>npm run build</id>
+                  <goals>
+                    <goal>npm</goal>
+                  </goals>
+                  <configuration>
+                    <arguments>run build</arguments>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+
+            <!-- Copy frontend build to resources -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-resources-plugin</artifactId>
+              <version>3.3.1</version>
+              <executions>
+                <execution>
+                  <id>copy-frontend-build</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                    <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                    <outputDirectory>target/classes/static</outputDirectory>
+                    <resources>
+                      <resource>
+                        <directory>frontend/build</directory>
+                        <filtering>false</filtering>
+                      </resource>
+                    </resources>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>

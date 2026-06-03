@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.admin.ui.controller;
+package com.mediaforge.imgflux.upload.controller.web;
 
 import java.io.InputStream;
 import java.security.Principal;
@@ -9,8 +9,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.mediaforge.imgflux.admin.ui.dto.ImageInfo;
 import com.mediaforge.imgflux.engine.service.storage.MinIOStorageService;
+import com.mediaforge.imgflux.upload.dto.ImageInfo;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
 import io.minio.Result;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin")
 @Slf4j
 public class AdminUIController {
-    @Value("${img-flux.storage.bucket.name:origin-image}")
+    @Value("${img-flux.storage.options.minio.bucket:original-image}")
     private String bucketName;
     
     @Autowired

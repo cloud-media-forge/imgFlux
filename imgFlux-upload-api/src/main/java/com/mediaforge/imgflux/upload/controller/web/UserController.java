@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.admin.ui.controller;
+package com.mediaforge.imgflux.upload.controller.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

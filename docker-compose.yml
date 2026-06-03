@@ -48,24 +48,6 @@ services:
     volumes:
       - ./config:/app/config
 
-  # Image Admin UI
-  imgFlux-admin-ui:
-    image: cloudmediaforge/imgflux-admin:latest
-    container_name: imgflux-admin-ui
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=default
-    depends_on:
-      minio:
-        condition: service_healthy
-      imgFlux-upload-api:
-        condition: service_started
-      imgFlux-download-api:
-        condition: service_started
-    volumes:
-      - ./config:/app/config
-
 volumes:
   minio-data:
     driver: local

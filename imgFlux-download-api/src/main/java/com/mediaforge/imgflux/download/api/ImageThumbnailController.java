@@ -43,7 +43,7 @@ public class ImageThumbnailController {
 
     private static final Set<String> VALID_MODES = Set.of("local", "remote");
 
-    @Value("${img-flux.storage.bucket.name:original-image}")
+    @Value("${img-flux.storage.options.minio.bucket:original-image}")
     private String bucketName;
 
     @Value("${img-flux.image.supported-formats:JPG,JPEG,PNG,GIF,AVIF,WEBP}")

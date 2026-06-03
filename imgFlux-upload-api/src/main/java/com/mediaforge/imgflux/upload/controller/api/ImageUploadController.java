@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.upload.controller;
+package com.mediaforge.imgflux.upload.controller.api;
 
 import java.io.IOException;
 import java.util.Arrays;

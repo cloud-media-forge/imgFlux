@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.admin.ui.dto;
+package com.mediaforge.imgflux.upload.dto;
 
 import java.time.LocalDateTime;
 

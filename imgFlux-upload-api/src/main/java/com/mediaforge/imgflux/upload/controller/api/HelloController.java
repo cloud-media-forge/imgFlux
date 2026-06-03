@@ -1,4 +1,4 @@
-package com.mediaforge.imgflux.admin.ui.controller;
+package com.mediaforge.imgflux.upload.controller.api;
 
 
 import org.springframework.web.bind.annotation.GetMapping;

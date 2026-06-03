@@ -12,6 +12,10 @@ spring:
   h2:
     console:
       enabled: false
+  security:
+    user:
+      name: admin
+      password: admin123
 
 img-flux:
   storage:

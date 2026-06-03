@@ -181,13 +181,13 @@ const ImageList = () => {
           <Col md={3}>
             <div className="list-group">
               <Link to="/dashboard" className="list-group-item list-group-item-action">Dashboard</Link>
-              <Link to="/video" className="list-group-item list-group-item-action active">My Videos</Link>
+              <Link to="/video" className="list-group-item list-group-item-action active">My Images</Link>
             </div>
           </Col>
           <Col md={9}>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <h2>My Videos</h2>
+                <h2>My Images</h2>
                 <Breadcrumb>
                   <Breadcrumb.Item onClick={navigateToHome}>Home</Breadcrumb.Item>
                   {currentPath && <Breadcrumb.Item active>{currentPath}</Breadcrumb.Item>}
@@ -249,7 +249,7 @@ const ImageList = () => {
                 ))}
                 {images.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="text-center">No videos found</td>
+                      <td colSpan="4" className="text-center">No Files found</td>
                     </tr>
                 )}
                 </tbody>

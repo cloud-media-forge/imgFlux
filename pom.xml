@@ -26,7 +26,6 @@
 		<module>imgFlux-engine</module>
 		<module>imgFlux-upload-api</module>
 		<module>imgFlux-download-api</module>
-		<module>imgFlux-admin-ui</module>
 	</modules>
 
 	<dependencyManagement>

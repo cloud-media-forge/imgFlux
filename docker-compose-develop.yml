@@ -84,33 +84,6 @@ services:
       minio:
         condition: service_healthy
 
-  imgflux-admin-ui:
-    image: cloudmediaforge/imgflux-admin:latest
-    container_name: imgflux-admin-ui
-    ports:
-      - "8083:8080"
-    environment:
-      - SPRING_PROFILE=develop
-      - DB_URL=jdbc:mysql://mysql:3306/imgflux
-      - DB_USERNAME=imgflux
-      - DB_PASSWD=imgflux123
-      - IMGFLUX_STORAGE_TYPE=minio
-      - IMGFLUX_STORAGE_BUCKET=original-image
-      - IMGFLUX_STORAGE_ENDPOINT=http://minio:9000
-      - IMGFLUX_STORAGE_ACCESS_KEY=minioadmin
-      - IMGFLUX_STORAGE_SECRET_KEY=minioadmin
-      - IMGFLUX_STORAGE_REGION=
-      - IMGFLUX_CDN_BASE_URL=http://localhost:9001
-      - IMGFLUX_CDN_API_KEY=
-    depends_on:
-      mysql:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-      imgflux-upload-api:
-        condition: service_started
-      imgflux-download-api:
-        condition: service_started
 
 volumes:
   mysql-data:

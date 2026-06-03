@@ -87,7 +87,6 @@ mvn test
 # Start services
 mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
-mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
 ## License
