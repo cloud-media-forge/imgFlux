@@ -89,13 +89,6 @@ Thumbs.db
 *.jar.original
 *.war.original
 
-# Application configuration
-application-*.yml
-application-*.yaml
-application-*.properties
-!application.yml
-!application.yaml
-!application.properties
 
 # Logs
 logs/
@@ -119,3 +112,4 @@ node_modules/
 # Mac OS
 .DS_Store
 .qoder/
+/.qoder/

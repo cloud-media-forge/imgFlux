@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: false
+
+img-flux:
+  storage:
+    type: ${IMGFLUX_STORAGE_TYPE:minio}
+    bucket:
+      name: ${IMGFLUX_STORAGE_BUCKET:original-image}
+    options:
+      minio:
+        endpoint: ${IMGFLUX_STORAGE_ENDPOINT:http://minio:9000}
+        access-key: ${IMGFLUX_STORAGE_ACCESS_KEY:minioadmin}
+        secret-key: ${IMGFLUX_STORAGE_SECRET_KEY:minioadmin}
+        bucket: ${IMGFLUX_STORAGE_BUCKET:original-image}
+
+      aws:
+        s3:
+          access-key: ${IMGFLUX_STORAGE_ACCESS_KEY:}
+          secret-access-key: ${IMGFLUX_STORAGE_SECRET_KEY:}
+          region: ${IMGFLUX_STORAGE_REGION:us-east-1}
+          bucket: ${IMGFLUX_STORAGE_BUCKET:}
+
+      alibaba:
+        oss:
+          access-key: ${IMGFLUX_STORAGE_ACCESS_KEY:}
+          secret-key: ${IMGFLUX_STORAGE_SECRET_KEY:}
+          endpoint: ${IMGFLUX_STORAGE_ENDPOINT:}
+          bucket: ${IMGFLUX_STORAGE_BUCKET:}
+
+  cdn:
+    base-url: ${IMGFLUX_CDN_BASE_URL:http://localhost:9001}
+    api-key: ${IMGFLUX_CDN_API_KEY:}
