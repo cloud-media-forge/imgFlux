@@ -5,6 +5,7 @@
   <properties>
     <java.version>17</java.version>
     <spring-boot.version>3.5.14</spring-boot.version>
+    <revision>0.1.0</revision>
   </properties>
 
   <parent>
@@ -15,7 +16,7 @@
 	</parent>
 	<groupId>com.mediaforge</groupId>
 	<artifactId>imgflux</artifactId>
-  <version>0.1.0</version>
+  <version>${revision}</version>
 	<name>ImgFlux</name>
 	<description>ImgFlux — High-performance image forge service.</description>
 	<packaging>pom</packaging>

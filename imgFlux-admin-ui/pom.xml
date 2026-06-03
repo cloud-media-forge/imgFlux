@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.mediaforge</groupId>
         <artifactId>imgflux</artifactId>
-        <version>0.1.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>imgFlux-admin-ui</artifactId>
@@ -46,21 +46,21 @@
         <dependency>
             <groupId>com.mediaforge</groupId>
             <artifactId>imgFlux-engine</artifactId>
-            <version>0.1.0</version>
+            <version>${revision}</version>
         </dependency>
 
         <!-- Image upload API -->
         <dependency>
             <groupId>com.mediaforge</groupId>
             <artifactId>imgFlux-upload-api</artifactId>
-            <version>0.1.0</version>
+            <version>${revision}</version>
         </dependency>
 
         <!-- Image download and resize -->
         <dependency>
             <groupId>com.mediaforge</groupId>
             <artifactId>imgFlux-download-api</artifactId>
-            <version>0.1.0</version>
+            <version>${revision}</version>
         </dependency>
         
         <!-- Spring Boot Test -->

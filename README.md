@@ -120,7 +120,7 @@ imgFlux/
 ```bash
 git clone 
 cd imgFlux
-docker-compose up -d
+docker-compose up -d -f docker-compose-develop.yml
 # Access: http://localhost:8080
 ```
 

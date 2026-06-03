@@ -43,6 +43,7 @@ const Dashboard = () => {
           </Col>
           <Col md={9}>
             <h2>Dashboard</h2>
+            <p className="text-muted">Welcome, {username}!</p>
             <Row>
               <Col md={4}>
                 <Card className="text-white bg-primary mb-3">

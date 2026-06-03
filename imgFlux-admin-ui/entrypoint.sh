@@ -27,6 +27,6 @@ echo "JAVA_OPTS: $JAVA_OPTS"
 echo "SERVER_PORT: $SERVER_PORT"
 
 # Start the application
-exec java $JAVA_OPTS -jar /app/app.jar --server.port=$SERVER_PORT
+exec java $JAVA_OPTS -jar /app/app.jar --server.port=$SERVER_PORT >> ${APP_LOG_PATH}/app.log 2>&1
 
 
