@@ -8,6 +8,7 @@ import com.mediaforge.imgflux.engine.service.cdn.CdnService;
 import com.mediaforge.imgflux.engine.service.storage.ObjectStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.mediaforge.imgflux.download.utils.ResizePathUtils.ResizePath;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/thumbnail")
+@Slf4j
 public class ImageThumbnailController {
     
     @Autowired
@@ -74,7 +76,7 @@ public class ImageThumbnailController {
             
             return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("viewImage error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -144,22 +146,22 @@ public class ImageThumbnailController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("resize error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping({"/resize/{mode}/{resize_param}/{path}", "/resize/{mode}/{resize_param}/**"})
+    @GetMapping({"/resize/{mode}/{resize_param}/{*imagePath}"})
     public ResponseEntity<byte[]> resizeImage(
-            HttpServletRequest request,
             @PathVariable("mode") String mode,
-            @PathVariable("resize_param") String resizeParam) {
+            @PathVariable("resize_param") String resizeParam,
+            @PathVariable("imagePath") String imagePath) {
         try {
             validateMode(mode);
 
             ThumbnailDefinition definition = ResizeParamParser.parseResizeParam(resizeParam);
-            String imagePath = ResizePathUtils.extractResizeImagePath(request, mode, resizeParam);
-            ResizePath resizePath = ResizePathUtils.parseResizePath(imagePath, supportedFormats);
+            String normalizedImagePath = ResizePathUtils.normalizeDecodedImagePath(imagePath);
+            ResizePath resizePath = ResizePathUtils.parseResizePath(normalizedImagePath, supportedFormats);
 
             byte[] originalImageData = downloadImage(mode, resizePath.sourcePath());
             definition.setImageData(originalImageData);
@@ -177,7 +179,7 @@ public class ImageThumbnailController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error processing image", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -211,8 +213,9 @@ public class ImageThumbnailController {
 
     private byte[] downloadImage(String mode, String path) {
         if ("remote".equals(mode)) {
-            // Fix URL encoding issue: Spring strips one slash from https:// in path
-            String fixedPath = path.replaceFirst("^https:/", "https://");
+            // Normalize single-slash form (https:/example.com) back to double-slash.
+            // Callers may hit either form depending on URL normalization in transit.
+            String fixedPath = path.replaceFirst("^https:/([^/])", "https://$1");
             return restTemplate.getForObject(fixedPath, byte[].class);
         }
         return objectStorageService.downloadFile(bucketName, path);

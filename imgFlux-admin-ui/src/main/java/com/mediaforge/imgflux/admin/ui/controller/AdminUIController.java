@@ -15,6 +15,7 @@ import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
 import io.minio.Result;
 import io.minio.messages.Item;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin")
+@Slf4j
 public class AdminUIController {
     @Value("${img-flux.storage.bucket.name:origin-image}")
     private String bucketName;
@@ -144,7 +146,7 @@ public class AdminUIController {
             }
         } catch (Exception e) {
             // If getting image list fails, log error and use empty list
-            e.printStackTrace();
+            log.error("listImages error", e);
         }
 
         response.put("images", images);
@@ -254,7 +256,7 @@ public class AdminUIController {
                 .headers(headers)
                 .body(imageData);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("viewImageDirect error", e);
             return ResponseEntity.notFound().build();
         }
     }

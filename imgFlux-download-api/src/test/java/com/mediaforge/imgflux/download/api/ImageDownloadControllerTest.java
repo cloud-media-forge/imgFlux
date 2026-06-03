@@ -202,10 +202,7 @@ public class ImageDownloadControllerTest {
         when(objectStorageService.downloadFile("original-image", sourcePath)).thenReturn(originalImageData);
         when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/local/100x200q-75extrimrans:ko:zh-CN/" + imagePath);
-
-        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "local", "100x200q-75extrimrans:ko:zh-CN");
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage("local", "100x200q-75extrimrans:ko:zh-CN", imagePath);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -292,10 +289,7 @@ public class ImageDownloadControllerTest {
         when(restTemplate.getForObject(fixedRemoteUrl, byte[].class)).thenReturn(originalImageData);
         when(imageProcessingService.processImage(any(ThumbnailDefinition.class))).thenReturn(processedImageData);
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/remote/100x200q-75/" + remoteUrlInPath);
-
-        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "remote", "100x200q-75");
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage("remote", "100x200q-75", remoteUrlInPath);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -336,10 +330,7 @@ public class ImageDownloadControllerTest {
 
         when(objectStorageService.downloadFile("original-image", imagePath)).thenReturn(originalImageData);
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/v1/thumbnail/resize/invalid/100x200/" + imagePath);
-
-        ResponseEntity<byte[]> response = imageDownloadController.resizeImage(request, "invalid", "100x200");
+        ResponseEntity<byte[]> response = imageDownloadController.resizeImage("invalid", "100x200", imagePath);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }

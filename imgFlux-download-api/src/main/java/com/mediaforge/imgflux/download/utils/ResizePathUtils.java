@@ -1,6 +1,5 @@
 package com.mediaforge.imgflux.download.utils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,17 +9,23 @@ public final class ResizePathUtils {
     private ResizePathUtils() {
     }
 
-    public static String extractResizeImagePath(HttpServletRequest request, String mode, String resizeParam) {
-        String prefix = "/api/v1/thumbnail/resize/" + mode + "/" + resizeParam + "/";
-        String requestUri = request.getRequestURI();
-        if (!requestUri.startsWith(prefix)) {
-            throw new IllegalArgumentException("Invalid resize path");
-        }
-        String imagePath = requestUri.substring(prefix.length());
-        if (imagePath.isBlank()) {
+    /**
+     * Normalize a decoded image path coming from Spring's catch-all path variable
+     * ({@code {*name}}). Spring delivers the matched remainder with a leading slash
+     * (e.g. "/folder/image.png" or "/https://example.com/a.png"); this method strips
+     * that leading slash and validates the result is non-empty.
+     */
+    public static String normalizeDecodedImagePath(String decodedImagePath) {
+        if (decodedImagePath == null || decodedImagePath.isBlank()) {
             throw new IllegalArgumentException("Image path is required");
         }
-        return imagePath;
+        if (decodedImagePath.startsWith("/")) {
+            decodedImagePath = decodedImagePath.substring(1);
+        }
+        if (decodedImagePath.isBlank()) {
+            throw new IllegalArgumentException("Image path is required");
+        }
+        return decodedImagePath;
     }
 
     public static ResizePath parseResizePath(String imagePath, String supportedFormats) {
