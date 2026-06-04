@@ -40,7 +40,8 @@ flows.
 | Docker support        | ✅ Ready to use        | 
 | JWT auth              | ✅ Built-in            |
 
-## Image Processing Examples
+## Image Processing
+### Thumbnail Examples
 
 | Features                              | Original Image | After Operation                                                                                       |
 |---------------------------------------|----------------|-------------------------------------------------------------------------------------------------------|
@@ -133,9 +134,9 @@ mvn spring-boot:run -pl imgFlux-download-api
 mvn spring-boot:run -pl imgFlux-admin-ui
 ```
 
-### Upload and Generate Thumbnail
+## Upload and Generate Thumbnail
 
-Upload an image:
+### Upload an image:
 
 ```bash
 curl http://localhost:8080/api/v1/upload/xxxx/xx.png
@@ -149,6 +150,19 @@ xxxx/xx.png
 
 Use the returned `path` to generate a thumbnail:
 
+### Create a thumbnail
+**Thumbnail URL structure**
+```
+  http://${yourDomain}/api/v1/thumbnail/resize/${resizeParam}/${url}
+```
+**Parameters**
+
+- mode: `local` or `remote`
+- resizeParam: format [width]x[height]q[qulity][ex][trim], example : 300x300q80trim
+- url: image URL
+    - local: image key in object storage
+    - remote: image URL, example: https://brand.github.com/_next/static/media/logo-03.cc5e5332.png
+
 **Local mode (image stored in object storage):**
 ```bash
 path=xxxx/xx.png.webp
@@ -158,7 +172,7 @@ curl http://localhost:8080/api/v1/thumbnail/resize/local/240x240q90trim/${path}
 
 **Remote mode (image from remote URL):**
 ```bash
-curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://example.com/image.jpg"
+curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png"
 // it will download the image from the remote URL and process it
 ```
 
@@ -168,8 +182,19 @@ curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https:
 curl "http://localhost:8080/api/v1/thumbnail/forge/local/folder/image.png?width=240&height=240&quality=90&format=webp"
 
 # Remote mode
-curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/image.jpg?width=240&height=240&quality=90&format=webp"
+curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png?width=240&height=240&quality=90&format=webp"
 ```
+### Online Demo
+| <div style="width:150px">Features</div>           | <div style="width:150px">url</div>                                                          | <div style="width:200px">preview</div>                                                                |
+|-------------------|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **original**      | https://brand.github.com/_next/static/media/logo-03.cc5e5332.png                            | ![origin](https://brand.github.com/_next/static/media/logo-03.cc5e5332.png)                           |
+| **Resize 200x200** | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Resized](doc/assets/logo-03.cc5e5332-500x500.png)                                                   |
+| **Trim**          | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Trimmed](doc/assets/logo-03.cc5e5332-trim.png)                                                      |
+| **Extent**        | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200ex/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Extended](doc/assets/logo-03.cc5e5332-ex.png)                                                       |
+| **Quality 5%**    | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q5/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Quality 5](doc/assets/logo-03.cc5e5332-q5.png)                                                      |
+| **Convert format** | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q80/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png.webp | ![Conver to WEBP format](doc/assets/logo-03.cc5e5332-q5.webp)                                         |
+| **Text Translation** (Korean→English) | not available in Demo                                                                       | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
+| **Text Translation** (Korean→Chinese) | not available in Demo                                                                       | ![Translated to Chinese](imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
 
 
 ## Tech Stack
@@ -181,6 +206,11 @@ curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/im
 - **JWT** - Authentication & authorization
 - **H2 Database** - Embedded database
 - **Thymeleaf** - Template engine
+## Development
+
+> Any company which access and use this product is welcome to register at the [address](https://github.com/cloud-media-forge/imgFlux/issues/1), only for product promotion purpose.
+
+Welcome everyone’s attention and use, XXL-JOB will also embrace changes, sustainable development.
 
 ## Contributing
 

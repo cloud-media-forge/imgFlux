@@ -8,7 +8,7 @@ public class ThumbnailDefinition {
     private int quality;
     private boolean extent;
     private boolean trim;
-    private String format;
+    private String toFormat;
     private String srcLang;
     private String toLang;
 
@@ -60,12 +60,12 @@ public class ThumbnailDefinition {
         this.trim = trim;
     }
 
-    public String getFormat() {
-        return format;
+    public String getToFormat() {
+        return toFormat;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
+    public void setToFormat(String toFormat) {
+        this.toFormat = toFormat;
     }
 
     public String getSrcLang() {

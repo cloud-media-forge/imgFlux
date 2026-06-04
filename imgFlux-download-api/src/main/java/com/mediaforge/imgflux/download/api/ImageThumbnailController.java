@@ -4,7 +4,6 @@ import com.mediaforge.imgflux.download.utils.ResizeParamParser;
 import com.mediaforge.imgflux.download.utils.ResizePathUtils;
 import com.mediaforge.imgflux.engine.gm.ImageProcessingService;
 import com.mediaforge.imgflux.engine.gm.ThumbnailDefinition;
-import com.mediaforge.imgflux.engine.service.cdn.CdnService;
 import com.mediaforge.imgflux.engine.service.storage.ObjectStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.mediaforge.imgflux.download.utils.ResizePathUtils.ResizePath;
@@ -129,7 +128,7 @@ public class ImageThumbnailController {
             definition.setQuality(quality);
             definition.setExtent(extent);
             definition.setTrim(trim);
-            definition.setFormat(format);
+            definition.setToFormat(format);
             definition.setSrcLang(srcLang);
             definition.setToLang(toLang);
             byte[] processedImageData = imageProcessingService.processImage(definition);
@@ -168,12 +167,12 @@ public class ImageThumbnailController {
 
             byte[] originalImageData = downloadImage(mode, resizePath.sourcePath());
             definition.setImageData(originalImageData);
-            definition.setFormat(resizePath.targetFormat());
+            definition.setToFormat(resizePath.targetFormat());
 
             byte[] processedImageData = imageProcessingService.processImage(definition);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(getContentType(definition.getFormat())));
+            headers.setContentType(MediaType.parseMediaType(getContentType(definition.getToFormat())));
             if (processedImageData != null) {
                 headers.setContentLength(processedImageData.length);
             }

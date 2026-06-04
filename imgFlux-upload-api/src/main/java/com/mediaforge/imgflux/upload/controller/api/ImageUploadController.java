@@ -99,7 +99,7 @@ public class ImageUploadController {
             definition.setQuality(quality);
             definition.setExtent(extent);
             definition.setTrim(trim);
-            definition.setFormat(format);
+            definition.setToFormat(format);
             byte[] processedImageData = imageProcessingService.processImage(definition);
 
             // Calculate hash value

@@ -130,7 +130,7 @@ public class ImageDownloadControllerTest {
         assertEquals(100, def.getWidth());
         assertEquals(100, def.getHeight());
         assertEquals(80, def.getQuality());
-        assertEquals("JPG", def.getFormat());
+        assertEquals("JPG", def.getToFormat());
     }
     
     @Test
@@ -220,7 +220,7 @@ public class ImageDownloadControllerTest {
         assertEquals(75, definition.getQuality());
         assertEquals(true, definition.isExtent());
         assertEquals(true, definition.isTrim());
-        assertEquals("WEBP", definition.getFormat());
+        assertEquals("WEBP", definition.getToFormat());
         assertEquals("ko", definition.getSrcLang());
         assertEquals("zh-CN", definition.getToLang());
     }

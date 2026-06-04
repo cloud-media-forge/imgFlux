@@ -129,9 +129,9 @@ mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
 ```
 
-### 上传图片并生成缩略图
+## 上传图片并生成缩略图
 
-上传图片：
+### 上传图片
 
 ```bash
 curl http://localhost:8080/api/v1/upload/xxxx/xx.png
@@ -142,7 +142,7 @@ curl http://localhost:8080/api/v1/upload/xxxx/xx.png
 ```text
 xxxx/xx.png
 ```
-
+### 生成缩略图
 使用 upload 返回的 `path` 生成缩略图：
 
 **本地模式（图片存储在对象存储中）：**
@@ -154,7 +154,7 @@ curl http://localhost:8080/api/v1/thumbnail/resize/local/240x240q90trim/${path}
 
 **远程模式（图片来自远程URL）：**
 ```bash
-curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://example.com/image.jpg"
+curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png"
 // 它将从远程URL下载图片并进行处理
 ```
 
@@ -164,8 +164,21 @@ curl "http://localhost:8080/api/v1/thumbnail/resize/remote/240x240q90trim/https:
 curl "http://localhost:8080/api/v1/thumbnail/forge/local/folder/image.png?width=240&height=240&quality=90&format=webp"
 
 # 远程模式
-curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/image.jpg?width=240&height=240&quality=90&format=webp"
+curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png?width=240&height=240&quality=90&format=webp"
 ```
+
+### 在线演示缩略图
+| <div style="width:50px">功能</div> | <div style="width:150px">url</div>                                                           | <div style="width:200px">预览</div>                                                                     |
+|-------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **原图**            | https://brand.github.com/_next/static/media/logo-03.cc5e5332.png                             | ![origin](https://brand.github.com/_next/static/media/logo-03.cc5e5332.png)                           |
+| **压缩到尺寸 200x200** | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Resized](doc/assets/logo-03.cc5e5332-500x500.png)                                                   |
+| **去掉主体四周的白色背景**   | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Trimmed](doc/assets/logo-03.cc5e5332-trim.png)                                                      |
+| **扩展到指定尺寸**       | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200ex/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Extended](doc/assets/logo-03.cc5e5332-ex.png)                                                       |
+| **压缩质量到 5%**      | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q5/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Quality 5](doc/assets/logo-03.cc5e5332-q5.png)                                                      |
+| **转换格式**          | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q80/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png.webp | ![Conver to WEBP format](doc/assets/logo-03.cc5e5332-q5.webp)                                         |
+| **翻译图片上的文字** (Korean→English) | not available in Demo                                                                        | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
+| **翻译图片上的文字** (Korean→Chinese) | not available in Demo                                                                        | ![Translated to Chinese](imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
+
 
 ## 技术栈
 
@@ -178,12 +191,15 @@ curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://example.com/im
 - **Thymeleaf** - 模板引擎
 
 ## 贡献
+接入的公司，欢迎在 [登记地址](https://github.com/cloud-media-forge/imgFlux/issues/1) 登记，登记仅仅为了产品推广。
+
+欢迎大家的关注和使用，imgFlux也将拥抱变化，持续发展。
 
 欢迎贡献！请查看 [CONTRIBUTING.zh-CN.md](doc/CONTRIBUTING.zh-CN.md) 了解详情。
 
 ## 许可证
 
-本项目采用 [MIT 许可证](LICENSE)。
+本项目采用 [GPL 许可证](LICENSE)。
 
 ## 联系方式
 

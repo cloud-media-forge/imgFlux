@@ -11,9 +11,6 @@ public class GraphicsMagickImageProcessingService implements ImageProcessingServ
     private static final Logger logger = LoggerFactory.getLogger(GraphicsMagickImageProcessingService.class);
     
     @Autowired
-    private Gm4JavaBatchCommand gmService;
-    
-    @Autowired
     private GMImageProcessor gmImageProcessor;
     
     @Override

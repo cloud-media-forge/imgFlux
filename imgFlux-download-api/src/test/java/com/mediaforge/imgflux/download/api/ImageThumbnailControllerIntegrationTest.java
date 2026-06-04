@@ -65,7 +65,7 @@ public class ImageThumbnailControllerIntegrationTest {
         assertEquals(70, definition.getQuality());
         assertEquals(true, definition.isExtent());
         assertEquals(true, definition.isTrim());
-        assertEquals("WEBP", definition.getFormat());
+        assertEquals("WEBP", definition.getToFormat());
         assertEquals("ja", definition.getSrcLang());
         assertEquals("en", definition.getToLang());
     }
