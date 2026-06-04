@@ -36,9 +36,6 @@ public class ImageThumbnailController {
     private ObjectStorageService objectStorageService;
     
     @Autowired
-    private CdnService cdnService;
-
-    @Autowired
     private RestTemplate restTemplate;
 
     private static final Set<String> VALID_MODES = Set.of("local", "remote");
@@ -48,6 +45,9 @@ public class ImageThumbnailController {
 
     @Value("${img-flux.image.supported-formats:JPG,JPEG,PNG,GIF,AVIF,WEBP}")
     private String supportedFormats;
+
+    @Value("${img-flux.image.crawl-prevent.turn-on:false}")
+    private boolean turnOnPreventCrawl;
     
     /**
      * View image - Get original image from MinIO server using image path as parameter
@@ -101,8 +101,10 @@ public class ImageThumbnailController {
         try {
             validateMode(mode);
 
+
             // Extract image path from request path
             String requestUri = request.getRequestURI();
+            preventCraw(requestUri);
             String prefix = "/api/v1/thumbnail/forge/" + mode + "/";
             String imagePath = requestUri.substring(prefix.length());
 
@@ -158,6 +160,7 @@ public class ImageThumbnailController {
             @PathVariable("imagePath") String imagePath) {
         try {
             validateMode(mode);
+            preventCraw(imagePath);
 
             ThumbnailDefinition definition = ResizeParamParser.parseResizeParam(resizeParam);
             String normalizedImagePath = ResizePathUtils.normalizeDecodedImagePath(imagePath);
@@ -224,6 +227,15 @@ public class ImageThumbnailController {
     private void validateMode(String mode) {
         if (!VALID_MODES.contains(mode)) {
             throw new IllegalArgumentException("Invalid mode: " + mode + ". Must be 'local' or 'remote'.");
+        }
+    }
+
+    private void preventCraw(String url) {
+        if(!turnOnPreventCrawl){
+            return;
+        }
+        if (!url.contains("logo-03.cc5e5332")){
+            throw new IllegalArgumentException("No permission: your operation is not allowed");
         }
     }
 

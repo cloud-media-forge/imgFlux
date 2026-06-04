@@ -38,6 +38,9 @@ img-flux:
           secret-key: ${IMGFLUX_STORAGE_SECRET_KEY:}
           endpoint: ${IMGFLUX_STORAGE_ENDPOINT:}
           bucket: ${IMGFLUX_STORAGE_BUCKET:}
+    image:
+      crawl-prevent:
+        turn-on: false
 
   cdn:
     base-url: ${IMGFLUX_CDN_BASE_URL:http://localhost:9001}
