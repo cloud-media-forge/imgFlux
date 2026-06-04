@@ -40,14 +40,14 @@
 
 ## 图片处理效果展示
 
-| Features                    | Original Image | After Operation                                                                                       |
-|-----------------------------|----------------|-------------------------------------------------------------------------------------------------------|
-| **改变尺寸**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg)             |
-| **独钓白边让主体更大**               | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg)                       |
-| **扩展图片**                    | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg)            |
-| **尺寸不变压缩质量**                | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg)                  |
-| **图片文字翻译** (Korean→English) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
-| **图片文字翻译** (Korean→Chinese) | ![Original](imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
+| 功能                          | 原图                                                                        | 处理后效果                                                                                                    |
+|-----------------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| **改变尺寸**                    | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Resized 200x127](../imgFlux-engine/src/test/resources/translate/C2-1BIG-resize-result.jpg)             |
+| **独钓白边让主体更大**               | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Trimmed](../imgFlux-engine/src/test/resources/translate/C2-1BIG-trim-result.jpg)                       |
+| **扩展图片**                    | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Extended 550x350](../imgFlux-engine/src/test/resources/translate/C2-1BIG-extent-result.jpg)            |
+| **尺寸不变压缩质量**                | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Quality 5](../imgFlux-engine/src/test/resources/translate/C2-1BIG-quality-result.jpg)                  |
+| **图片文字翻译** (Korean→English) | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](../imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
+| **图片文字翻译** (Korean→Chinese) | ![Original](/imgFlux-engine/src/test/resources/translate/src/C2-1BIG.jpg) | ![Translated to English](../imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
 
 ## 图像功能规划
 
@@ -171,13 +171,13 @@ curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://brand.github.c
 | <div style="width:50px">功能</div> | <div style="width:150px">url</div>                                                           | <div style="width:200px">预览</div>                                                                     |
 |-------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
 | **原图**            | https://brand.github.com/_next/static/media/logo-03.cc5e5332.png                             | ![origin](https://brand.github.com/_next/static/media/logo-03.cc5e5332.png)                           |
-| **压缩到尺寸 200x200** | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Resized](doc/assets/logo-03.cc5e5332-500x500.png)                                                   |
-| **去掉主体四周的白色背景**   | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Trimmed](doc/assets/logo-03.cc5e5332-trim.png)                                                      |
-| **扩展到指定尺寸**       | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200ex/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Extended](doc/assets/logo-03.cc5e5332-ex.png)                                                       |
-| **压缩质量到 5%**      | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q5/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Quality 5](doc/assets/logo-03.cc5e5332-q5.png)                                                      |
-| **转换格式**          | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q80/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png.webp | ![Conver to WEBP format](doc/assets/logo-03.cc5e5332-q5.webp)                                         |
-| **翻译图片上的文字** (Korean→English) | not available in Demo                                                                        | ![Translated to English](imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
-| **翻译图片上的文字** (Korean→Chinese) | not available in Demo                                                                        | ![Translated to Chinese](imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
+| **压缩到尺寸 200x200** | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Resized](../doc/assets/logo-03.cc5e5332-500x500.png)                                                   |
+| **去掉主体四周的白色背景**   | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200trim/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Trimmed](../doc/assets/logo-03.cc5e5332-trim.png)                                                      |
+| **扩展到指定尺寸**       | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200ex/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Extended](../doc/assets/logo-03.cc5e5332-ex.png)                                                       |
+| **压缩质量到 5%**      | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q5/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png | ![Quality 5](../doc/assets/logo-03.cc5e5332-q5.png)                                                      |
+| **转换格式**          | http://thumbnail.rnh-inc.com/api/v1/thumbnail/resize/remote/200x200q80/https://brand.github.com/_next/static/media/logo-03.cc5e5332.png.webp | ![Conver to WEBP format](../doc/assets/logo-03.cc5e5332-q5.webp)                                         |
+| **翻译图片上的文字** (Korean→English) | not available in Demo                                                                        | ![Translated to English](../imgFlux-engine/src/test/resources/translate/C2-1BIG-en-result.jpg)           |
+| **翻译图片上的文字** (Korean→Chinese) | not available in Demo                                                                        | ![Translated to Chinese](../imgFlux-engine/src/test/resources/translate/output/C2-1BIG-zh-CN-result.jpg) |
 
 
 ## 技术栈
