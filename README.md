@@ -210,7 +210,7 @@ curl "http://localhost:8080/api/v1/thumbnail/forge/remote/https://brand.github.c
 
 > Any company which access and use this product is welcome to register at the [address](https://github.com/cloud-media-forge/imgFlux/issues/1), only for product promotion purpose.
 
-Welcome everyone’s attention and use, XXL-JOB will also embrace changes, sustainable development.
+Welcome everyone’s attention and use, imgFlux will also embrace changes, sustainable development.
 
 ## Contributing
 
