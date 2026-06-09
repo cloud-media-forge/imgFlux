@@ -114,3 +114,4 @@ node_modules/
 .qoder/
 /.qoder/
 /.qoder/
+/imgFlux-upload-api/${project.build.directory}/

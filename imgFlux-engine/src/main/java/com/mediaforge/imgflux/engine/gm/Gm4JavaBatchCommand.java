@@ -28,22 +28,17 @@ public class Gm4JavaBatchCommand {
     @PostConstruct
     public void init() {
         try {
-            // Create GM connection pool configuration
             GMConnectionPoolConfig config = new GMConnectionPoolConfig();
             config.setMaxActive(gmConfigProperties.getPoolSize());
             config.setMaxIdle(gmConfigProperties.getPoolSize());
             config.setMinIdle(1);
-
-            // Create PooledGMService
             gmService = new PooledGMService(config);
-
-            // Create GMBatchCommand
             gmBatchCommand = new GMBatchCommand(gmService, "convert");
-            
             logger.info("GM service initialized with pool size: {}", gmConfigProperties.getPoolSize());
         } catch (Exception e) {
-            logger.error("Failed to initialize GM service", e);
-            throw new RuntimeException("Failed to initialize GM service", e);
+            logger.warn("GM service not available — image processing will use Java2D fallbacks. Cause: {}", e.getMessage());
+            gmService = null;
+            gmBatchCommand = null;
         }
     }
     
@@ -60,9 +55,10 @@ public class Gm4JavaBatchCommand {
      */
     @Bean
     public GMBatchCommand getGMBatchCommand() {
-        if (gmBatchCommand == null) {
-            throw new IllegalStateException("GMBatchCommand not initialized");
-        }
         return gmBatchCommand;
+    }
+
+    public boolean isAvailable() {
+        return gmBatchCommand != null;
     }
 }

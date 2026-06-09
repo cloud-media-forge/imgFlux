@@ -39,6 +39,7 @@ flows.
 | Modular design        | ✅ Independent modules | 
 | Docker support        | ✅ Ready to use        | 
 | JWT auth              | ✅ Built-in            |
+| MCP Server (AI)       | ✅ Spring AI MCP       |
 
 ## Image Processing
 ### Thumbnail Examples
@@ -104,14 +105,154 @@ ImgFlux provides open-source alternatives to popular paid image processing servi
 - **Manga cleanup** - Comic and manga image enhancement
 - **Content management** - Digital asset management for media companies
 
+## MCP Server (AI Agent Integration)
+
+The `imgFlux-mcp-server` module exposes ImgFlux's image processing capabilities as [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) tools, enabling AI agents like Claude Desktop, Cursor, and other MCP-compatible clients to process images through natural language.
+
+### MCP Server Feature Highlights
+
+| Feature | Description |
+|---------|-------------|
+| **6 Image Tools** | `resizeImage`, `trimImage`, `convertImageFormat`, `translateImageText`, `processImage`, `getImageInfo` |
+| **Natural Language Driven** | AI agents call tools based on user intent — no API knowledge required |
+| **GraphicsMagick + Java2D Fallback** | Full performance with GM; pure Java fallback when GM is unavailable |
+| **SSE Transport** | HTTP-based Server-Sent Events transport for broad client compatibility |
+| **Spring AI MCP** | Built on [Spring AI MCP Server](https://docs.spring.io/spring-ai/reference/api/mcp.html) for standards-compliant integration |
+| **Combined Operations** | `processImage` tool chains resize + trim + format + translation in one call |
+
+### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `resizeImage` | Resize image to specified dimensions with quality control and format conversion |
+| `trimImage` | Remove white/blank borders from images |
+| `convertImageFormat` | Convert between JPG, PNG, WEBP, GIF formats |
+| `translateImageText` | OCR-based text detection and translation on images (8 languages) |
+| `processImage` | Combined operations: resize + trim + extent + format + translation |
+| `getImageInfo` | Read image metadata: dimensions, format, file size |
+
+### Integration Steps
+
+#### 1. Build and Start the MCP Server
+
+```bash
+# Build from project root
+mvn clean install -pl imgFlux-mcp-server -am
+
+# Start the MCP server (default port: 8088)
+mvn spring-boot:run -pl imgFlux-mcp-server
+```
+
+The server starts at `http://localhost:8088` with SSE transport enabled.
+
+#### 2. Configure Your AI Client
+
+**Claude Desktop** — Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "imgflux": {
+      "url": "http://localhost:8088/sse"
+    }
+  }
+}
+```
+
+**Cursor** — Add to `.cursor/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "imgflux": {
+      "url": "http://localhost:8088/sse"
+    }
+  }
+}
+```
+
+**Other MCP Clients** — Point your client's SSE transport to `http://localhost:8088/sse`.
+
+#### 3. Verify the Connection
+
+Once connected, ask your AI assistant:
+- "What image processing tools are available?"
+- "Resize `/path/to/image.png` to 800x600"
+- "Remove the white borders from `/path/to/photo.jpg`"
+
+### Usage Examples
+
+#### Example 1: Resize an Image via Natural Language
+
+**You:** "Resize `/photos/banner.png` to 1200x400 and save it as `/photos/banner-small.png`"
+
+**AI** calls `resizeImage` with:
+```json
+{
+  "inputPath": "/photos/banner.png",
+  "outputPath": "/photos/banner-small.png",
+  "width": 1200,
+  "height": 400,
+  "quality": 80,
+  "format": "PNG"
+}
+```
+
+**Result:** `Image resized to 1200x400 and saved to /photos/banner-small.png (245760 bytes)`
+
+#### Example 2: Batch Workflow — Trim + Resize + Convert
+
+**You:** "Clean up `/product/photo.jpg` — remove white borders, resize to 500x500, and convert to WEBP at `/product/photo.webp`"
+
+**AI** calls `processImage` with:
+```json
+{
+  "inputPath": "/product/photo.jpg",
+  "outputPath": "/product/photo.webp",
+  "width": 500,
+  "height": 500,
+  "quality": 85,
+  "format": "WEBP",
+  "trim": true,
+  "extent": false,
+  "srcLang": "",
+  "toLang": ""
+}
+```
+
+**Result:** `Image processed: resized 500x500 trimmed converted to WEBP -> /product/photo.webp (38400 bytes)`
+
+#### Example 3: Translate Text on an Image
+
+**You:** "Translate the Korean text on `/screenshots/app-ui.png` to English and save to `/screenshots/app-ui-en.png`"
+
+**AI** calls `translateImageText` with:
+```json
+{
+  "inputPath": "/screenshots/app-ui.png",
+  "outputPath": "/screenshots/app-ui-en.png",
+  "srcLang": "ko",
+  "toLang": "en"
+}
+```
+
+#### Example 4: Get Image Info
+
+**You:** "What's the size and format of `/assets/logo.png`?"
+
+**AI** calls `getImageInfo` and responds:
+
+> "The image is 1024x768 pixels, PNG format, 245.3 KB."
+
 ## Project Structure
 
 ```
 imgFlux/
-├── image-process-engine/     # Image processing library
+├── imgFlux-engine/             # Image processing library
 ├── imgFlux-upload-api/         # Image upload REST API module
 ├── imgFlux-download-api/       # Image download and resize module
 ├── imgFlux-admin-ui/           # Admin UI module
+├── imgFlux-mcp-server/         # MCP server for AI agent integration
 ```
 
 ## Quick Start
@@ -132,6 +273,7 @@ mvn clean install
 mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
 mvn spring-boot:run -pl imgFlux-admin-ui
+mvn spring-boot:run -pl imgFlux-mcp-server    # MCP server on port 8088
 ```
 
 ## Upload and Generate Thumbnail

@@ -37,6 +37,7 @@
 | 模块化设计    | ✅ 独立模块           | 
 | Docker支持 | ✅ 开箱即用           |
 | JWT认证    | ✅ 内置             |
+| MCP Server (AI) | ✅ Spring AI MCP  |
 
 ## 图片处理效果展示
 
@@ -102,13 +103,153 @@ ImgFlux 为流行的付费图片处理服务提供开源替代方案：
 - **漫画清理** - 漫画和漫画图片增强
 - **内容管理** - 媒体公司的数字资产管理
 
+## MCP Server（AI 智能体集成）
+
+`imgFlux-mcp-server` 模块将 ImgFlux 的图片处理能力以 [MCP（Model Context Protocol）](https://modelcontextprotocol.io/) 工具的形式暴露给 AI 智能体，使 Claude Desktop、Cursor 等 MCP 兼容客户端能够通过自然语言处理图片。
+
+### MCP Server 功能亮点
+
+| 功能 | 说明 |
+|------|------|
+| **6 个图片处理工具** | `resizeImage`、`trimImage`、`convertImageFormat`、`translateImageText`、`processImage`、`getImageInfo` |
+| **自然语言驱动** | AI 智能体根据用户意图自动调用工具，无需了解 API |
+| **GraphicsMagick + Java2D 双引擎** | 有 GM 时高性能处理，无 GM 时自动回退纯 Java 实现 |
+| **SSE 传输协议** | 基于 HTTP 的 Server-Sent Events 传输，兼容广泛的客户端 |
+| **Spring AI MCP** | 基于 [Spring AI MCP Server](https://docs.spring.io/spring-ai/reference/api/mcp.html) 构建，符合 MCP 标准规范 |
+| **组合操作** | `processImage` 工具支持在一次调用中链式执行缩放 + 裁剪 + 扩展 + 格式转换 + 文字翻译 |
+
+### 可用 MCP 工具
+
+| 工具 | 说明 |
+|------|------|
+| `resizeImage` | 按指定尺寸缩放图片，支持质量控制和格式转换 |
+| `trimImage` | 去除图片四周的白色/空白边框 |
+| `convertImageFormat` | 在 JPG、PNG、WEBP、GIF 格式之间转换 |
+| `translateImageText` | 基于 OCR 检测并翻译图片上的文字（支持 8 种语言） |
+| `processImage` | 组合操作：缩放 + 裁剪 + 扩展 + 格式转换 + 文字翻译 |
+| `getImageInfo` | 读取图片元数据：尺寸、格式、文件大小 |
+
+### 接入步骤
+
+#### 1. 构建并启动 MCP Server
+
+```bash
+# 在项目根目录构建
+mvn clean install -pl imgFlux-mcp-server -am
+
+# 启动 MCP 服务器（默认端口: 8088）
+mvn spring-boot:run -pl imgFlux-mcp-server
+```
+
+服务器启动后在 `http://localhost:8088` 提供 SSE 传输服务。
+
+#### 2. 配置 AI 客户端
+
+**Claude Desktop** — 在 `claude_desktop_config.json` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "imgflux": {
+      "url": "http://localhost:8088/sse"
+    }
+  }
+}
+```
+
+**Cursor** — 在项目根目录的 `.cursor/mcp.json` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "imgflux": {
+      "url": "http://localhost:8088/sse"
+    }
+  }
+}
+```
+
+**其他 MCP 客户端** — 将客户端的 SSE 传输地址指向 `http://localhost:8088/sse`。
+
+#### 3. 验证连接
+
+连接成功后，向 AI 助手提问：
+- "有哪些可用的图片处理工具？"
+- "把 `/path/to/image.png` 缩放到 800x600"
+- "去掉 `/path/to/photo.jpg` 的白色边框"
+
+### 使用示例
+
+#### 示例 1：通过自然语言缩放图片
+
+**你：** "把 `/photos/banner.png` 缩放到 1200x400，保存为 `/photos/banner-small.png`"
+
+**AI** 调用 `resizeImage`，参数：
+```json
+{
+  "inputPath": "/photos/banner.png",
+  "outputPath": "/photos/banner-small.png",
+  "width": 1200,
+  "height": 400,
+  "quality": 80,
+  "format": "PNG"
+}
+```
+
+**结果：** `Image resized to 1200x400 and saved to /photos/banner-small.png (245760 bytes)`
+
+#### 示例 2：批量工作流 — 裁剪 + 缩放 + 格式转换
+
+**你：** "处理一下 `/product/photo.jpg` — 去掉白色边框，缩放到 500x500，转为 WEBP 格式保存到 `/product/photo.webp`"
+
+**AI** 调用 `processImage`，参数：
+```json
+{
+  "inputPath": "/product/photo.jpg",
+  "outputPath": "/product/photo.webp",
+  "width": 500,
+  "height": 500,
+  "quality": 85,
+  "format": "WEBP",
+  "trim": true,
+  "extent": false,
+  "srcLang": "",
+  "toLang": ""
+}
+```
+
+**结果：** `Image processed: resized 500x500 trimmed converted to WEBP -> /product/photo.webp (38400 bytes)`
+
+#### 示例 3：翻译图片上的文字
+
+**你：** "把 `/screenshots/app-ui.png` 上的韩文翻译成英文，保存到 `/screenshots/app-ui-en.png`"
+
+**AI** 调用 `translateImageText`，参数：
+```json
+{
+  "inputPath": "/screenshots/app-ui.png",
+  "outputPath": "/screenshots/app-ui-en.png",
+  "srcLang": "ko",
+  "toLang": "en"
+}
+```
+
+#### 示例 4：获取图片信息
+
+**你：** "`/assets/logo.png` 的尺寸和格式是什么？"
+
+**AI** 调用 `getImageInfo` 并回复：
+
+> "该图片尺寸为 1024x768 像素，PNG 格式，文件大小 245.3 KB。"
+
 ## 项目结构
 
 ```
 imgFlux/
-├── image-process-engine/     # 图片处理公共库
+├── imgFlux-engine/             # 图片处理公共库
 ├── imgFlux-upload-api/         # 图片上传REST API模块
 ├── imgFlux-download-api/       # 图片下载和resize模块
+├── imgFlux-mcp-server/         # MCP服务器，用于AI智能体集成
 ```
 
 ## 快速开始
@@ -127,6 +268,7 @@ docker-compose up -d -f docker-compose-develop.yml
 mvn clean install
 mvn spring-boot:run -pl imgFlux-upload-api
 mvn spring-boot:run -pl imgFlux-download-api
+mvn spring-boot:run -pl imgFlux-mcp-server    # MCP服务器，端口8088
 ```
 
 ## 上传图片并生成缩略图

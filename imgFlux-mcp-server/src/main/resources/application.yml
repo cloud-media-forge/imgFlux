@@ -1,0 +1,19 @@
+spring:
+  ai:
+    mcp:
+      server:
+        name: imgflux-mcp-server
+        version: 0.1.0
+
+server:
+  port: 8088
+
+img-flux:
+  gm:
+    pool-size: 4
+
+thumbnail:
+  translate:
+    enabled: false
+    tesseract:
+      datapath: /usr/share/tesseract-ocr/5/tessdata
